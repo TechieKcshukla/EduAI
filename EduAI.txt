@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduAI — AI-Powered Learning Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   RESET & TOKENS
+═══════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0b0e17;--ink2:#141720;--ink3:#1c2030;--ink4:#242840;
+  --bd:#2c3148;--bd2:#1f2338;
+  --jade:#00e5a0;--jade-g:rgba(0,229,160,.07);--jade-glow:0 0 30px rgba(0,229,160,.18);
+  --amber:#ffb930;--amber-g:rgba(255,185,48,.07);
+  --coral:#ff6b6b;--coral-g:rgba(255,107,107,.07);
+  --violet:#a78bfa;--violet-g:rgba(167,139,250,.07);
+  --sky:#38bdf8;
+  --t1:#eef0f8;--t2:#8890a8;--t3:#4a5068;
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'JetBrains Mono',monospace;
+  --r1:8px;--r2:14px;--r3:20px;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--ink);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.5}
+button{cursor:pointer;border:none;background:none;font-family:var(--fb)}
+input,select{font-family:var(--fb)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--ink2)}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+
+/* ═══════════════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulseJade{0%,100%{box-shadow:0 0 0 0 rgba(0,229,160,.4)}50%{box-shadow:0 0 0 8px rgba(0,229,160,0)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes countUp{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes barGrow{from{width:0}to{width:var(--w)}}
+@keyframes ringDash{from{stroke-dashoffset:var(--from)}to{stroke-dashoffset:var(--to)}}
+@keyframes typewriter{from{width:0}to{width:100%}}
+@keyframes blink{50%{opacity:0}}
+
+.fu{animation:fadeUp .5s ease both}
+.fi{animation:fadeIn .35s ease both}
+.si{animation:slideIn .4s ease both}
+.float-anim{animation:float 3.5s ease-in-out infinite}
+
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════ */
+#app{display:flex;height:100vh;overflow:hidden}
+
+/* ═══════════════════════════════════════════════════════════
+   ENROLLMENT SCREEN
+═══════════════════════════════════════════════════════════ */
+/* auth screen handled inline */
+.enroll-card{
+  width:100%;max-width:500px;padding:36px;
+  background:var(--ink2);border:1px solid var(--bd);border-radius:22px;
+  box-shadow:0 0 60px rgba(0,229,160,.08),0 32px 80px rgba(0,0,0,.5);
+  animation:fadeUp .6s ease;
+}
+.step-dots{display:flex;justify-content:center;gap:6px;margin-bottom:28px}
+.step-dot{height:8px;border-radius:100px;background:var(--bd);transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.step-dot.active{width:28px;background:var(--jade)}
+.step-dot.done{width:8px;background:var(--jade)}
+.step-dot.future{width:8px}
+
+/* ═══════════════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════════════ */
+#sidebar{
+  width:220px;min-width:220px;height:100vh;
+  background:var(--ink);border-right:1px solid var(--bd2);
+  display:flex;flex-direction:column;
+  position:relative;z-index:50;flex-shrink:0;
+}
+.sidebar-logo{
+  padding:22px 18px 18px;
+  border-bottom:1px solid var(--bd2);
+}
+.logo-mark{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.logo-mark span:first-child{font-size:20px}
+.logo-text{font-family:var(--fd);font-size:19px;font-weight:800;color:var(--jade);letter-spacing:-.5px}
+
+.student-card{
+  background:var(--ink3);border:1px solid var(--bd);border-radius:12px;padding:11px 12px;
+}
+.student-info{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.student-avatar{font-size:22px}
+.student-name{font-size:13px;font-weight:600;color:var(--t1);line-height:1.2}
+.student-meta{font-size:11px;color:var(--t2)}
+.prog-label{display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-bottom:4px;letter-spacing:.06em}
+.prog-bar-track{height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
+.prog-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--jade),var(--violet));transition:width .8s ease}
+.prog-count{font-size:10px;color:var(--t3);margin-top:4px}
+
+nav{flex:1;padding:14px 10px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:10px 12px;border-radius:10px;
+  background:transparent;border:1px solid transparent;
+  color:var(--t2);font-size:14px;font-weight:400;
+  margin-bottom:3px;text-align:left;
+  transition:all .2s;
+}
+.nav-item:hover{background:rgba(0,229,160,.05);color:var(--t1)}
+.nav-item.active{
+  background:rgba(0,229,160,.08);
+  border-color:rgba(0,229,160,.25);
+  color:var(--jade);font-weight:600;
+}
+.nav-item .nav-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--jade);margin-left:auto;
+  display:none;
+}
+.nav-item.active .nav-dot{display:block}
+.nav-icon{font-size:15px;font-family:monospace}
+.sidebar-footer{padding:12px;border-top:1px solid var(--bd2);position:relative}
+#modal-profile,#modal-logout{display:none}
+#modal-profile.open,#modal-logout.open{display:flex!important}
+#logged-out-screen.open{display:flex!important}
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════════════════════ */
+#main{flex:1;overflow-y:auto;padding:30px 32px;min-width:0}
+
+.page{display:none}
+.page.active{display:block;animation:fadeUp .45s ease}
+
+.page-header{margin-bottom:24px}
+.page-title{font-family:var(--fd);font-size:24px;font-weight:800;color:var(--t1);letter-spacing:-.5px;margin:0}
+.page-subtitle{color:var(--t2);font-size:13px;margin:4px 0 0}
+
+/* ═══════════════════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════════════════ */
+.card{
+  background:var(--ink2);border:1px solid var(--bd);
+  border-radius:16px;padding:20px;
+  transition:border-color .25s,box-shadow .25s,transform .25s;
+}
+.card.glow-jade{box-shadow:0 0 40px rgba(0,229,160,.08)}
+.card.glow-violet{box-shadow:0 0 40px rgba(167,139,250,.1)}
+.card.hoverable:hover{border-color:var(--jade);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,160,.1)}
+
+.card-title{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1);margin:0 0 16px}
+
+/* ═══════════════════════════════════════════════════════════
+   GRID LAYOUTS
+═══════════════════════════════════════════════════════════ */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-2-3{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
+.grid-1-15{display:grid;grid-template-columns:1fr 1.5fr;gap:16px}
+
+/* ═══════════════════════════════════════════════════════════
+   KPI CARDS
+═══════════════════════════════════════════════════════════ */
+.kpi-card{background:var(--ink2);border:1px solid var(--bd);border-radius:16px;padding:18px;transition:all .25s}
+.kpi-card:hover{transform:translateY(-3px)}
+.kpi-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.kpi-icon{font-size:20px}
+.kpi-pulse{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.kpi-value{font-family:var(--fd);font-size:28px;font-weight:800;line-height:1;animation:countUp .6s ease both}
+.kpi-label{font-size:12px;font-weight:600;color:var(--t1);margin-top:5px}
+.kpi-sub{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* ═══════════════════════════════════════════════════════════
+   BADGES & TAGS
+═══════════════════════════════════════════════════════════ */
+.badge{
+  display:inline-block;padding:2px 10px;border-radius:100px;
+  font-size:11px;font-weight:600;letter-spacing:.03em;
+}
+.tag{
+  display:inline-block;padding:3px 9px;border-radius:100px;
+  font-size:11px;font-weight:500;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 22px;border-radius:10px;
+  font-size:14px;font-weight:600;letter-spacing:.01em;
+  cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);
+  border:none;font-family:var(--fb);
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--jade);color:#0b0e17}
+.btn-secondary{background:transparent;color:var(--jade);border:1px solid rgba(0,229,160,.35)}
+.btn-secondary:hover{background:var(--jade-g)}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--bd)}
+.btn-ghost:hover{color:var(--t1);border-color:var(--t2)}
+.btn-sm{padding:6px 14px;font-size:12px;border-radius:8px}
+.btn-lg{padding:14px 32px;font-size:15px}
+.btn-full{width:100%}
+.btn-disabled{opacity:.4;pointer-events:none}
+
+/* ═══════════════════════════════════════════════════════════
+   MINI PROGRESS BARS
+═══════════════════════════════════════════════════════════ */
+.bar-wrap{margin-bottom:10px}
+.bar-meta{display:flex;justify-content:space-between;margin-bottom:4px}
+.bar-label{font-size:12px;color:var(--t3);font-weight:500}
+.bar-val{font-size:12px;color:var(--t1);font-weight:600}
+.bar-track{height:6px;background:var(--ink3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.2s cubic-bezier(.34,1.1,.64,1)}
+
+/* ═══════════════════════════════════════════════════════════
+   RADIAL CHARTS (SVG)
+═══════════════════════════════════════════════════════════ */
+.radial-wrap{display:flex;flex-direction:column;align-items:center;gap:5px}
+.radial-label{font-size:11px;color:var(--t3);font-weight:500;text-align:center}
+.radial-row{display:flex;justify-content:space-around;margin-bottom:18px}
+
+/* ═══════════════════════════════════════════════════════════
+   SUBJECT TABS
+═══════════════════════════════════════════════════════════ */
+.subject-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.subject-tab{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 14px;border-radius:10px;cursor:pointer;
+  border:2px solid var(--bd);background:var(--ink2);
+  color:var(--t2);font-size:13px;font-weight:500;
+  transition:all .2s;
+}
+.subject-tab:hover{border-color:var(--jade);color:var(--jade)}
+.subject-tab.active{border-color:var(--jade);background:var(--jade-g);color:var(--jade);font-weight:700}
+.subject-tab .tab-count{background:rgba(0,229,160,.15);color:var(--jade);padding:1px 7px;border-radius:100px;font-size:11px}
+
+/* ═══════════════════════════════════════════════════════════
+   CHAPTER ACCORDION
+═══════════════════════════════════════════════════════════ */
+.chapter-item{
+  background:var(--ink2);border:1px solid var(--bd);
+  border-radius:14px;overflow:hidden;margin-bottom:8px;
+  transition:border-color .25s,box-shadow .25s;
+}
+.chapter-item:hover{border-color:rgba(0,229,160,.3)}
+.chapter-header{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;cursor:pointer;
+  user-select:none;
+}
+.ch-num{
+  width:34px;height:34px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:12px;font-weight:700;flex-shrink:0;
+}
+.ch-info{flex:1;min-width:0}
+.ch-name{font-weight:700;font-size:14px;font-family:var(--fd)}
+.ch-meta{font-size:12px;color:var(--t2);margin-top:2px}
+.ch-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ch-arrow{color:var(--t2);font-size:12px;transition:transform .3s}
+.chapter-item.expanded .ch-arrow{transform:rotate(180deg)}
+.chapter-body{
+  display:none;padding:0 18px 18px;
+  border-top:1px solid var(--bd2);
+  animation:fadeIn .3s ease;
+}
+.chapter-item.expanded .chapter-body{display:block;animation:fadeIn .3s ease}
+.ch-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.ch-section-title{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.07em;margin-bottom:9px}
+.topic-item{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--bd2);font-size:13px;color:var(--t1)}
+.topic-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:5px}
+
+/* ═══════════════════════════════════════════════════════════
+   PRACTICE SECTION
+═══════════════════════════════════════════════════════════ */
+.practice-select-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:18px}
+.ch-select-list{max-height:280px;overflow-y:auto;margin-bottom:14px}
+.ch-btn{
+  display:flex;justify-content:space-between;align-items:center;
+  width:100%;padding:10px 12px;border-radius:9px;margin-bottom:5px;
+  border:1.5px solid var(--bd);background:var(--ink3);
+  color:var(--t1);font-size:13px;text-align:left;
+  transition:all .2s;
+}
+.ch-btn:hover{border-color:rgba(0,229,160,.4);color:var(--jade)}
+.ch-btn.selected{border-color:var(--jade);background:var(--jade-g);color:var(--jade);font-weight:600}
+
+/* QUIZ UI */
+.quiz-progress-wrap{margin-bottom:18px}
+.quiz-progress-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.quiz-track{height:5px;background:var(--ink3);border-radius:2.5px;overflow:hidden}
+.quiz-fill{height:100%;background:linear-gradient(90deg,var(--jade),var(--violet));border-radius:2.5px;transition:width .4s ease}
+.question-text{font-size:15px;font-weight:500;line-height:1.75;color:var(--t1);margin-bottom:22px}
+.option{
+  display:flex;align-items:center;gap:11px;
+  padding:13px 16px;border-radius:11px;border:2px solid var(--bd);
+  background:var(--ink3);cursor:pointer;
+  margin-bottom:9px;
+  transition:all .18s ease;
+}
+.option:hover:not(.answered){border-color:var(--jade);background:var(--jade-g);transform:translateX(4px)}
+.option.selected:not(.answered){border-color:var(--jade);background:var(--jade-g)}
+.option.correct{border-color:var(--jade)!important;background:rgba(0,229,160,.12)!important;color:var(--jade)}
+.option.wrong{border-color:var(--coral)!important;background:rgba(255,107,107,.1)!important;color:var(--coral)}
+.option.answered{cursor:default}
+.opt-label{
+  width:28px;height:28px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;
+  font-family:var(--fd);transition:all .2s;
+}
+.opt-text{font-size:13px;flex:1}
+.q-map{display:flex;gap:4px;flex-wrap:wrap;margin-top:12px}
+.q-dot{
+  width:22px;height:22px;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:700;color:#fff;
+  font-family:var(--fm);transition:all .3s;
+}
+
+/* RESULT */
+.result-score{
+  font-family:var(--fd);font-size:56px;font-weight:800;
+  line-height:1;animation:countUp .7s ease;
+}
+.result-status{padding:10px 20px;border-radius:10px;text-align:center;font-weight:700;font-size:14px}
+
+/* ═══════════════════════════════════════════════════════════
+   ANALYTICS - HEATMAP
+═══════════════════════════════════════════════════════════ */
+.heatmap-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.heat-cell{
+  width:36px;height:36px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;font-family:var(--fm);
+  cursor:default;transition:transform .2s;
+  border:1.5px solid transparent;
+}
+.heat-cell:hover{transform:scale(1.15)}
+.heat-legend{display:flex;gap:12px;flex-wrap:wrap}
+.heat-legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t3)}
+.heat-swatch{width:11px;height:11px;border-radius:3px}
+
+/* ═══════════════════════════════════════════════════════════
+   TIMELINE CHART
+═══════════════════════════════════════════════════════════ */
+.timeline-row{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.tl-num{font-size:10px;color:var(--t3);width:16px;text-align:right;font-family:var(--fm)}
+.tl-info{flex:1}
+.tl-bars{position:relative;height:7px;background:var(--ink3);border-radius:3px;overflow:hidden;margin-top:3px}
+.tl-acc{position:absolute;left:0;top:0;height:100%;border-radius:3px}
+.tl-spd{position:absolute;left:0;top:0;height:100%;border-radius:3px;mix-blend-mode:screen}
+
+/* ═══════════════════════════════════════════════════════════
+   REPORTS
+═══════════════════════════════════════════════════════════ */
+.report-type-card{
+  padding:13px 15px;border-radius:12px;margin-bottom:7px;
+  background:var(--ink2);border:1px solid var(--bd);
+  cursor:pointer;transition:all .22s;
+}
+.report-type-card:hover{border-color:var(--jade);background:var(--jade-g);transform:translateX(3px)}
+.report-type-card.active{border-color:var(--jade);background:var(--jade-g)}
+.report-type-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:2px}
+.report-type-desc{font-size:11px;color:var(--t3)}
+.report-content-box{min-height:320px}
+.report-ai-badge{
+  display:flex;align-items:center;gap:8px;padding:7px 11px;
+  background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);
+  border-radius:8px;margin-bottom:14px;font-size:11px;color:var(--violet);font-weight:600;
+}
+.report-text{font-size:13px;line-height:1.8;color:var(--t1);white-space:pre-line}
+
+/* AI TYPING EFFECT */
+.typing-cursor::after{content:'|';animation:blink 1s step-end infinite;color:var(--jade)}
+
+/* ═══════════════════════════════════════════════════════════
+   ENROLLMENT FORM ELEMENTS
+═══════════════════════════════════════════════════════════ */
+.form-group{margin-bottom:16px}
+.form-label{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;display:block;margin-bottom:8px}
+.form-input{
+  width:100%;background:var(--ink3);border:1.5px solid var(--bd);
+  border-radius:10px;padding:11px 14px;color:var(--t1);font-size:14px;outline:none;
+  transition:border-color .2s;font-family:var(--fb);
+}
+.form-input:focus{border-color:var(--jade)}
+.form-error{color:var(--coral);font-size:11px;margin-top:3px}
+.avatar-grid{display:flex;gap:7px;flex-wrap:wrap}
+.avatar-btn{
+  font-size:20px;padding:7px 9px;border-radius:9px;cursor:pointer;
+  background:var(--ink3);border:2px solid var(--bd);
+  transition:all .2s;
+}
+.avatar-btn:hover{border-color:rgba(0,229,160,.5);background:var(--jade-g)}
+.avatar-btn.selected{background:var(--jade-g);border-color:var(--jade)}
+.board-btn{
+  padding:8px 16px;border-radius:10px;cursor:pointer;
+  font-size:13px;font-weight:600;background:var(--ink3);
+  border:2px solid var(--bd);color:var(--t2);transition:all .2s;
+}
+.board-btn:hover{border-color:rgba(0,229,160,.4)}
+.board-btn.selected{background:var(--jade-g);border-color:var(--jade);color:var(--jade)}
+.class-btn{
+  width:50px;height:50px;border-radius:11px;cursor:pointer;
+  font-size:16px;font-weight:700;background:var(--ink3);
+  border:2px solid var(--bd);color:var(--t2);transition:all .2s;
+  font-family:var(--fd);
+}
+.class-btn:hover{border-color:rgba(0,229,160,.4)}
+.class-btn.selected{background:var(--jade-g);border-color:var(--jade);color:var(--jade)}
+
+/* ═══════════════════════════════════════════════════════════
+   LOADER
+═══════════════════════════════════════════════════════════ */
+.spinner{
+  width:28px;height:28px;border:2.5px solid rgba(0,229,160,.2);
+  border-top-color:var(--jade);border-radius:50%;
+  animation:spin .75s linear infinite;
+}
+.loading-screen{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:60px;
+  animation:fadeIn .3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MISC
+═══════════════════════════════════════════════════════════ */
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.gap-6{gap:6px}.gap-8{gap:8px}.gap-10{gap:10px}.gap-12{gap:12px}
+.mb-4{margin-bottom:4px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}
+.text-jade{color:var(--jade)}.text-amber{color:var(--amber)}.text-coral{color:var(--coral)}.text-violet{color:var(--violet)}.text-muted{color:var(--t2)}.text-dim{color:var(--t3)}
+.font-display{font-family:var(--fd)}.font-mono{font-family:var(--fm)}
+.hidden{display:none!important}
+.overflow-y{overflow-y:auto}
+.text-center{text-align:center}
+.w-full{width:100%}
+.shrink-0{flex-shrink:0}
+
+/* AI insight box */
+.ai-insight{
+  display:flex;gap:13px;align-items:flex-start;
+  padding:18px;background:var(--violet-g);
+  border:1px solid rgba(167,139,250,.2);border-radius:14px;
+}
+.ai-icon-box{
+  width:38px;height:38px;border-radius:9px;
+  background:rgba(167,139,250,.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+
+/* Subject progress item */
+.subj-prog-item{margin-bottom:14px}
+.subj-prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.subj-prog-name{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--t1)}
+
+/* Activity item */
+.activity-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd2)}
+.activity-item:last-child{border-bottom:none}
+.act-title{font-size:12px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.act-date{font-size:10px;color:var(--t3)}
+.act-score{font-size:11px;font-weight:600;text-align:right}
+.act-status{font-size:10px;text-align:right}
+
+/* Selected chapter preview */
+.ch-preview{
+  padding:12px;background:var(--ink3);border-radius:11px;
+  border:1px solid var(--bd);margin-bottom:12px;
+}
+
+/* READY SCREEN */
+.ready-card{padding:28px;text-align:center}
+.ready-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:22px}
+.ready-cell{background:var(--ink3);border:1px solid var(--bd);border-radius:10px;padding:12px 8px;text-align:center}
+.ready-val{font-family:var(--fd);font-size:22px;font-weight:800;line-height:1}
+.ready-lab{font-size:11px;color:var(--t2);margin-top:2px}
+.info-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.info-key{color:var(--t2)}.info-val{color:var(--t1);font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ AUTH WRAPPER ═══════════════════ -->
+<div id="auth-screen" style="position:fixed;inset:0;z-index:200;background:var(--ink);display:flex;align-items:center;justify-content:center;
+  background-image:radial-gradient(circle at 72% 18%,rgba(0,229,160,.05) 0%,transparent 50%),
+                   radial-gradient(circle at 18% 82%,rgba(167,139,250,.05) 0%,transparent 50%),
+                   radial-gradient(circle,rgba(255,255,255,.022) 1px,transparent 1px);
+  background-size:100% 100%,100% 100%,24px 24px;overflow-y:auto;padding:20px 0">
+
+  <!-- ══ LANDING PANEL ══ -->
+  <div id="auth-landing" style="width:100%;max-width:460px;padding:0 24px;animation:fadeUp .55s ease">
+    <div style="text-align:center;margin-bottom:36px">
+      <div class="float-anim" style="font-size:54px;margin-bottom:12px">⚡</div>
+      <div style="font-family:var(--fd);font-size:38px;font-weight:800;color:var(--jade);letter-spacing:-1.5px;line-height:1">EduAI</div>
+      <p style="color:var(--t3);font-size:14px;margin-top:8px;line-height:1.6">AI-Powered Learning · Adaptive Assessments<br>Performance Analytics</p>
+    </div>
+
+    <!-- feature pills -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:32px">
+      <span style="background:rgba(0,229,160,.1);color:var(--jade);border:1px solid rgba(0,229,160,.2);padding:5px 13px;border-radius:100px;font-size:12px;font-weight:500">📚 Full Syllabus</span>
+      <span style="background:rgba(167,139,250,.1);color:var(--violet);border:1px solid rgba(167,139,250,.2);padding:5px 13px;border-radius:100px;font-size:12px;font-weight:500">🤖 AI Questions</span>
+      <span style="background:rgba(255,185,48,.1);color:var(--amber);border:1px solid rgba(255,185,48,.2);padding:5px 13px;border-radius:100px;font-size:12px;font-weight:500">📊 Analytics</span>
+      <span style="background:rgba(56,189,248,.1);color:var(--sky);border:1px solid rgba(56,189,248,.2);padding:5px 13px;border-radius:100px;font-size:12px;font-weight:500">🏆 Progress Tracking</span>
+    </div>
+
+    <div style="background:var(--ink2);border:1px solid var(--bd);border-radius:20px;padding:28px;box-shadow:0 0 60px rgba(0,229,160,.06),0 24px 60px rgba(0,0,0,.4)">
+      <button onclick="showAuth('login')" style="width:100%;padding:14px;border-radius:12px;background:var(--jade);color:#0b0e17;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-bottom:12px;transition:all .22s;letter-spacing:.01em"
+        onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,229,160,.3)'"
+        onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+        🔑 Login to your account
+      </button>
+      <button onclick="showAuth('register')" style="width:100%;padding:14px;border-radius:12px;background:transparent;color:var(--jade);font-size:15px;font-weight:600;border:1.5px solid rgba(0,229,160,.35);cursor:pointer;transition:all .22s;letter-spacing:.01em"
+        onmouseenter="this.style.background='rgba(0,229,160,.07)';this.style.transform='translateY(-2px)'"
+        onmouseleave="this.style.background='transparent';this.style.transform='translateY(0)'">
+        ✨ Create new account
+      </button>
+      <p style="text-align:center;color:var(--t3);font-size:12px;margin-top:16px">Class 8–12 · CBSE · ICSE · State Board</p>
+    </div>
+  </div>
+
+  <!-- ══ LOGIN PANEL ══ -->
+  <div id="auth-login" style="display:none;width:100%;max-width:440px;padding:0 24px">
+    <div style="background:var(--ink2);border:1px solid var(--bd);border-radius:22px;box-shadow:0 0 60px rgba(0,229,160,.07),0 28px 70px rgba(0,0,0,.45);overflow:hidden">
+      <!-- header -->
+      <div style="padding:26px 28px 0">
+        <button onclick="showAuth('landing')" style="display:flex;align-items:center;gap:6px;color:var(--t3);font-size:13px;background:none;border:none;cursor:pointer;margin-bottom:20px;padding:6px 10px;border-radius:8px;transition:all .2s"
+          onmouseenter="this.style.background='var(--ink3)';this.style.color='var(--t1)'"
+          onmouseleave="this.style.background='none';this.style.color='var(--t3)'">← Back</button>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);display:flex;align-items:center;justify-content:center;font-size:18px">🔑</div>
+          <div>
+            <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--t1)">Welcome back</div>
+            <div style="font-size:12px;color:var(--t3)">Sign in to continue learning</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:22px 28px 28px">
+        <!-- Email -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">EMAIL ADDRESS</div>
+          <input id="li-email" type="email" placeholder="student@school.edu" class="form-input" style="width:100%"
+            onkeydown="if(event.key==='Enter')doLogin()">
+          <div id="li-err-email" style="color:var(--coral);font-size:11px;margin-top:3px;display:none"></div>
+        </div>
+
+        <!-- Password -->
+        <div style="margin-bottom:8px">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">PASSWORD</div>
+          <div style="position:relative">
+            <input id="li-pass" type="password" placeholder="Enter your password" class="form-input" style="width:100%;padding-right:44px"
+              onkeydown="if(event.key==='Enter')doLogin()">
+            <button onclick="togglePass('li-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);font-size:14px;cursor:pointer" title="Show/Hide password">👁</button>
+          </div>
+          <div id="li-err-pass" style="color:var(--coral);font-size:11px;margin-top:3px;display:none"></div>
+        </div>
+
+        <!-- General error -->
+        <div id="li-err-general" style="display:none;padding:10px 14px;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);border-radius:9px;color:var(--coral);font-size:13px;margin-bottom:14px;text-align:center"></div>
+
+        <button onclick="doLogin()" style="width:100%;padding:13px;border-radius:11px;background:var(--jade);color:#0b0e17;font-size:14px;font-weight:700;border:none;cursor:pointer;margin-bottom:18px;transition:all .22s"
+          onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,229,160,.28)'"
+          onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='none'">Sign In →</button>
+
+        <!-- Demo hint -->
+        <div style="padding:12px;background:var(--ink3);border:1px solid var(--bd);border-radius:10px;margin-bottom:16px">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.06em;margin-bottom:6px">DEMO ACCOUNT</div>
+          <div style="font-size:12px;color:var(--t2)">Email: <span style="color:var(--jade);font-family:var(--fm)">demo@eduai.in</span></div>
+          <div style="font-size:12px;color:var(--t2)">Password: <span style="color:var(--jade);font-family:var(--fm)">demo123</span></div>
+          <button onclick="fillDemo()" style="margin-top:8px;padding:5px 12px;border-radius:7px;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);color:var(--jade);font-size:11px;cursor:pointer;font-weight:600;transition:all .2s"
+            onmouseenter="this.style.background='rgba(0,229,160,.18)'" onmouseleave="this.style.background='rgba(0,229,160,.1)'">Use demo credentials</button>
+        </div>
+
+        <p style="text-align:center;color:var(--t3);font-size:13px">
+          Don't have an account?
+          <button onclick="showAuth('register')" style="color:var(--jade);background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;text-decoration:underline">Create one</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ REGISTER PANEL ══ -->
+  <div id="auth-register" style="display:none;width:100%;max-width:500px;padding:0 24px">
+    <div style="background:var(--ink2);border:1px solid var(--bd);border-radius:22px;box-shadow:0 0 60px rgba(167,139,250,.07),0 28px 70px rgba(0,0,0,.45);overflow:hidden">
+      <!-- header -->
+      <div style="padding:26px 28px 0">
+        <button onclick="showAuth('landing')" style="display:flex;align-items:center;gap:6px;color:var(--t3);font-size:13px;background:none;border:none;cursor:pointer;margin-bottom:20px;padding:6px 10px;border-radius:8px;transition:all .2s"
+          onmouseenter="this.style.background='var(--ink3)';this.style.color='var(--t1)'"
+          onmouseleave="this.style.background='none';this.style.color='var(--t3)'">← Back</button>
+
+        <!-- Step indicator -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+          <div id="reg-step-indicator" style="display:flex;gap:6px">
+            <div id="reg-dot1" style="height:8px;width:28px;border-radius:100px;background:var(--jade);transition:all .4s"></div>
+            <div id="reg-dot2" style="height:8px;width:8px;border-radius:100px;background:var(--bd);transition:all .4s"></div>
+            <div id="reg-dot3" style="height:8px;width:8px;border-radius:100px;background:var(--bd);transition:all .4s"></div>
+          </div>
+          <span id="reg-step-label" style="font-size:11px;color:var(--t3);margin-left:4px">Step 1 of 3</span>
+        </div>
+      </div>
+
+      <!-- STEP 1 — Personal Info -->
+      <div id="reg-step1" style="padding:0 28px 28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px">
+          <div style="width:38px;height:38px;border-radius:10px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:18px">✨</div>
+          <div>
+            <div style="font-family:var(--fd);font-size:19px;font-weight:800;color:var(--t1)">Create Account</div>
+            <div style="font-size:12px;color:var(--t3)">Personal information</div>
+          </div>
+        </div>
+
+        <!-- Avatar -->
+        <div style="margin-bottom:16px">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:9px">CHOOSE YOUR AVATAR</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap" id="reg-avatar-grid">
+            <button class="avatar-btn selected" onclick="regSelectAvatar(this,'🦁')">🦁</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🐯')">🐯</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🦊')">🦊</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🐺')">🐺</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🦅')">🦅</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🐬')">🐬</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🌟')">🌟</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🚀')">🚀</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'⚡')">⚡</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🔥')">🔥</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'💎')">💎</button>
+            <button class="avatar-btn" onclick="regSelectAvatar(this,'🦋')">🦋</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:13px">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">FULL NAME</div>
+          <input id="reg-name" type="text" placeholder="Your full name" class="form-input" style="width:100%">
+          <div id="reg-err-name" style="color:var(--coral);font-size:11px;margin-top:3px;display:none">Name is required</div>
+        </div>
+
+        <div style="margin-bottom:13px">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">EMAIL ADDRESS</div>
+          <input id="reg-email" type="email" placeholder="student@school.edu" class="form-input" style="width:100%">
+          <div id="reg-err-email" style="color:var(--coral);font-size:11px;margin-top:3px;display:none"></div>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">PASSWORD</div>
+          <div style="position:relative">
+            <input id="reg-pass" type="password" placeholder="Min 6 characters" class="form-input" style="width:100%;padding-right:44px">
+            <button onclick="togglePass('reg-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);font-size:14px;cursor:pointer">👁</button>
+          </div>
+          <div id="reg-err-pass" style="color:var(--coral);font-size:11px;margin-top:3px;display:none"></div>
+          <!-- password strength -->
+          <div style="margin-top:8px">
+            <div style="height:4px;background:var(--ink3);border-radius:2px;overflow:hidden">
+              <div id="pass-strength-bar" style="height:100%;width:0%;border-radius:2px;transition:all .3s"></div>
+            </div>
+            <div id="pass-strength-label" style="font-size:10px;color:var(--t3);margin-top:4px"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button onclick="showAuth('login')" style="flex:1;padding:12px;border-radius:11px;background:transparent;border:1px solid var(--bd);color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s"
+            onmouseenter="this.style.borderColor='var(--t2)'" onmouseleave="this.style.borderColor='var(--bd)'">Login instead</button>
+          <button onclick="regStep1Next()" style="flex:2;padding:12px;border-radius:11px;background:var(--jade);color:#0b0e17;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .22s"
+            onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform='translateY(0)'">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 — Board & Class -->
+      <div id="reg-step2" style="display:none;padding:0 28px 28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px">
+          <div id="reg-step2-avatar" style="font-size:32px">🦁</div>
+          <div>
+            <div style="font-family:var(--fd);font-size:19px;font-weight:800;color:var(--t1)">Hi, <span id="reg-step2-name">Student</span>!</div>
+            <div style="font-size:12px;color:var(--t3)">Choose your board & class</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:9px">EDUCATION BOARD</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="reg-board-grid">
+            <button class="board-btn" onclick="regSelectBoard(this,'CBSE')">CBSE</button>
+            <button class="board-btn" onclick="regSelectBoard(this,'ICSE')">ICSE</button>
+            <button class="board-btn" onclick="regSelectBoard(this,'State Board')">State Board</button>
+          </div>
+          <div id="reg-err-board" style="color:var(--coral);font-size:11px;margin-top:5px;display:none">Please select a board</div>
+        </div>
+
+        <div id="reg-class-group" style="margin-bottom:16px;opacity:.4;transition:opacity .3s">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:9px">CLASS</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="reg-class-grid"></div>
+          <div id="reg-err-class" style="color:var(--coral);font-size:11px;margin-top:5px;display:none">Please select a class</div>
+        </div>
+
+        <div id="reg-syllabus-preview" style="display:none;padding:12px;background:var(--ink3);border-radius:11px;border:1px solid var(--bd);margin-bottom:18px">
+          <div style="font-size:11px;color:var(--t3);margin-bottom:6px">SYLLABUS INCLUDES</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap" id="reg-syllabus-tags"></div>
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button onclick="regGoStep(1)" style="flex:1;padding:12px;border-radius:11px;background:transparent;border:1px solid var(--bd);color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s"
+            onmouseenter="this.style.borderColor='var(--t2)'" onmouseleave="this.style.borderColor='var(--bd)'">← Back</button>
+          <button onclick="regStep2Next()" id="reg-btn-step2" style="flex:2;padding:12px;border-radius:11px;background:var(--jade);color:#0b0e17;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .22s"
+            onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform='translateY(0)'">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 — Confirm -->
+      <div id="reg-step3" style="display:none;padding:0 28px 28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px">
+          <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);display:flex;align-items:center;justify-content:center;font-size:18px">✅</div>
+          <div>
+            <div style="font-family:var(--fd);font-size:19px;font-weight:800;color:var(--t1)">Almost done!</div>
+            <div style="font-size:12px;color:var(--t3)">Review your profile</div>
+          </div>
+        </div>
+
+        <!-- Profile summary card -->
+        <div style="background:var(--ink3);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bd2)">
+            <span id="reg-confirm-avatar" style="font-size:36px">🦁</span>
+            <div>
+              <div id="reg-confirm-name" style="font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1)">Student Name</div>
+              <div id="reg-confirm-email" style="font-size:12px;color:var(--t2);margin-top:2px">email@example.com</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="padding:10px 12px;background:var(--ink2);border-radius:9px;border:1px solid var(--bd2)">
+              <div style="font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.06em;margin-bottom:4px">BOARD</div>
+              <div id="reg-confirm-board" style="font-size:14px;font-weight:700;color:var(--jade)">CBSE</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--ink2);border-radius:9px;border:1px solid var(--bd2)">
+              <div style="font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.06em;margin-bottom:4px">CLASS</div>
+              <div id="reg-confirm-class" style="font-size:14px;font-weight:700;color:var(--jade)">10</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:10px 12px;background:var(--ink2);border-radius:9px;border:1px solid var(--bd2)">
+            <div style="font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.06em;margin-bottom:6px">SUBJECTS</div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap" id="reg-confirm-subjects"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button onclick="regGoStep(2)" style="flex:1;padding:12px;border-radius:11px;background:transparent;border:1px solid var(--bd);color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s"
+            onmouseenter="this.style.borderColor='var(--t2)'" onmouseleave="this.style.borderColor='var(--bd)'">← Edit</button>
+          <button onclick="finishRegister()" style="flex:2;padding:12px;border-radius:11px;background:var(--jade);color:#0b0e17;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .22s"
+            onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,229,160,.3)'"
+            onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='none'">🚀 Create Account &amp; Start!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /auth-screen -->
+
+<!-- ═══════════════════════════════════ MAIN APP ═══════════════════════════════════ -->
+<div id="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <span>⚡</span>
+        <span class="logo-text">EduAI</span>
+      </div>
+      <div class="student-card">
+        <div class="student-info">
+          <span class="student-avatar" id="sb-avatar">🦁</span>
+          <div>
+            <div class="student-name" id="sb-name">Student</div>
+            <div class="student-meta" id="sb-meta">Class 10 · CBSE</div>
+          </div>
+        </div>
+        <div class="prog-label"><span>PROGRESS</span><span id="sb-pct" style="color:var(--jade)">0%</span></div>
+        <div class="prog-bar-track"><div class="prog-bar-fill" id="sb-prog" style="width:0%"></div></div>
+        <div class="prog-count" id="sb-count">0/0 chapters</div>
+      </div>
+    </div>
+
+    <nav>
+      <button class="nav-item active" onclick="showPage('dashboard',this)">
+        <span class="nav-icon">⬡</span>Dashboard<span class="nav-dot"></span>
+      </button>
+      <button class="nav-item" onclick="showPage('syllabus',this)">
+        <span class="nav-icon">◧</span>Syllabus<span class="nav-dot"></span>
+      </button>
+      <button class="nav-item" onclick="showPage('practice',this)">
+        <span class="nav-icon">◈</span>Practice<span class="nav-dot"></span>
+      </button>
+      <button class="nav-item" onclick="showPage('analytics',this)">
+        <span class="nav-icon">◉</span>Analytics<span class="nav-dot"></span>
+      </button>
+      <button class="nav-item" onclick="showPage('reports',this)">
+        <span class="nav-icon">◫</span>Reports<span class="nav-dot"></span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <!-- User menu trigger -->
+      <div id="user-menu-btn" onclick="toggleUserMenu()" style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:11px;cursor:pointer;background:var(--ink3);border:1px solid var(--bd);transition:all .2s;position:relative;" onmouseenter="this.style.borderColor='rgba(0,229,160,.35)'" onmouseleave="this.style.borderColor='var(--bd)'">
+        <span id="umenu-avatar" style="font-size:20px">🦁</span>
+        <div style="flex:1;min-width:0">
+          <div id="umenu-name" style="font-size:12px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Student</div>
+          <div style="font-size:10px;color:var(--t3)">Manage account</div>
+        </div>
+        <span id="umenu-chevron" style="font-size:10px;color:var(--t3);transition:transform .3s">▲</span>
+      </div>
+
+      <!-- Dropdown menu -->
+      <div id="user-dropdown" style="display:none;position:absolute;bottom:78px;left:12px;right:12px;background:var(--ink2);border:1px solid var(--bd);border-radius:13px;box-shadow:0 -8px 32px rgba(0,0,0,.5),0 0 0 1px rgba(0,229,160,.06);overflow:hidden;z-index:200;animation:fadeUp .25s ease">
+        <div style="padding:10px 12px 6px;border-bottom:1px solid var(--bd2)">
+          <div style="font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.07em">ACCOUNT</div>
+        </div>
+        <div style="padding:6px">
+          <button onclick="openUpdateProfile()" style="display:flex;align-items:center;gap:9px;width:100%;padding:9px 11px;border-radius:9px;background:transparent;color:var(--t1);font-size:13px;font-weight:500;transition:all .2s;text-align:left" onmouseenter="this.style.background='rgba(0,229,160,.08)';this.style.color='var(--jade)'" onmouseleave="this.style.background='transparent';this.style.color='var(--t1)'">
+            <span style="font-size:15px">✏️</span>Update Profile
+          </button>
+          <button onclick="openLogout()" style="display:flex;align-items:center;gap:9px;width:100%;padding:9px 11px;border-radius:9px;background:transparent;color:var(--t2);font-size:13px;font-weight:500;transition:all .2s;text-align:left" onmouseenter="this.style.background='rgba(255,107,107,.08)';this.style.color='var(--coral)'" onmouseleave="this.style.background='transparent';this.style.color='var(--t2)'">
+            <span style="font-size:15px">🚪</span>Logout
+          </button>
+        </div>
+        <div style="padding:8px 12px;border-top:1px solid var(--bd2)">
+          <div style="font-size:10px;color:var(--t3)">EduAI v2.0 · AI-Powered Learning</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════ UPDATE PROFILE MODAL ══════════ -->
+  <div id="modal-profile" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center">
+    <div style="width:100%;max-width:480px;padding:24px;animation:fadeUp .35s ease">
+      <div style="background:var(--ink2);border:1px solid var(--bd);border-radius:22px;box-shadow:0 0 60px rgba(0,229,160,.08),0 32px 80px rgba(0,0,0,.5);overflow:hidden">
+
+        <!-- Modal header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 24px 18px;border-bottom:1px solid var(--bd2)">
+          <div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--t1)">Update Profile</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:2px">Edit your account details</div>
+          </div>
+          <button onclick="closeModal('modal-profile')" style="width:32px;height:32px;border-radius:8px;background:var(--ink3);border:1px solid var(--bd);color:var(--t2);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s" onmouseenter="this.style.borderColor='var(--coral)';this.style.color='var(--coral)'" onmouseleave="this.style.borderColor='var(--bd)';this.style.color='var(--t2)'">✕</button>
+        </div>
+
+        <div style="padding:24px">
+          <!-- Avatar picker -->
+          <div style="margin-bottom:18px">
+            <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:10px">AVATAR</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap" id="up-avatar-grid">
+              <!-- filled by JS -->
+            </div>
+          </div>
+
+          <!-- Name -->
+          <div style="margin-bottom:14px">
+            <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">FULL NAME</div>
+            <input id="up-name" type="text" placeholder="Your full name" style="width:100%;background:var(--ink3);border:1.5px solid var(--bd);border-radius:10px;padding:11px 14px;color:var(--t1);font-size:14px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--jade)'" onblur="this.style.borderColor='var(--bd)'">
+            <div id="up-err-name" style="color:var(--coral);font-size:11px;margin-top:3px;display:none">Name is required</div>
+          </div>
+
+          <!-- Email -->
+          <div style="margin-bottom:14px">
+            <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">EMAIL ADDRESS</div>
+            <input id="up-email" type="email" placeholder="student@school.edu" style="width:100%;background:var(--ink3);border:1.5px solid var(--bd);border-radius:10px;padding:11px 14px;color:var(--t1);font-size:14px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--jade)'" onblur="this.style.borderColor='var(--bd)'">
+            <div id="up-err-email" style="color:var(--coral);font-size:11px;margin-top:3px;display:none">Valid email required</div>
+          </div>
+
+          <!-- Board & Class (read-only info) -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px">
+            <div>
+              <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">BOARD</div>
+              <div id="up-board-display" style="padding:10px 14px;background:var(--ink3);border:1.5px solid var(--bd);border-radius:10px;font-size:14px;color:var(--t2)">CBSE</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.08em;margin-bottom:7px">CLASS</div>
+              <div id="up-class-display" style="padding:10px 14px;background:var(--ink3);border:1.5px solid var(--bd);border-radius:10px;font-size:14px;color:var(--t2)">10</div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex;gap:10px">
+            <button onclick="closeModal('modal-profile')" style="flex:1;padding:11px 20px;border-radius:10px;background:transparent;border:1px solid var(--bd);color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s" onmouseenter="this.style.borderColor='var(--t2)';this.style.color='var(--t1)'" onmouseleave="this.style.borderColor='var(--bd)';this.style.color='var(--t2)'">Cancel</button>
+            <button onclick="saveProfile()" style="flex:2;padding:11px 20px;border-radius:10px;background:var(--jade);color:#0b0e17;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .22s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform='translateY(0)'">Save Changes ✓</button>
+          </div>
+        </div>
+
+        <!-- Success banner (hidden) -->
+        <div id="up-success" style="display:none;margin:0 24px 24px;padding:12px 16px;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);border-radius:10px;color:var(--jade);font-size:13px;font-weight:600;text-align:center;animation:fadeIn .3s ease">
+          ✅ Profile updated successfully!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ LOGOUT CONFIRM MODAL ══════════ -->
+  <div id="modal-logout" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center">
+    <div style="width:100%;max-width:400px;padding:24px;animation:fadeUp .3s ease">
+      <div style="background:var(--ink2);border:1px solid var(--bd);border-radius:22px;box-shadow:0 0 60px rgba(255,107,107,.06),0 32px 80px rgba(0,0,0,.5);overflow:hidden">
+
+        <!-- Icon & message -->
+        <div style="padding:32px 28px 24px;text-align:center;border-bottom:1px solid var(--bd2)">
+          <div style="width:60px;height:60px;border-radius:16px;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px">🚪</div>
+          <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--t1);margin-bottom:8px">Logout?</div>
+          <p style="color:var(--t2);font-size:14px;line-height:1.6">Are you sure you want to log out?<br>Your progress is saved and will be here when you return.</p>
+        </div>
+
+        <!-- Student summary -->
+        <div style="padding:14px 20px;border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:10px">
+          <span id="lo-avatar" style="font-size:24px">🦁</span>
+          <div>
+            <div id="lo-name" style="font-size:13px;font-weight:600;color:var(--t1)">Student</div>
+            <div id="lo-meta" style="font-size:11px;color:var(--t3)">Class 10 · CBSE</div>
+          </div>
+          <div style="margin-left:auto">
+            <div id="lo-progress" style="font-size:13px;font-weight:700;color:var(--jade)">0%</div>
+            <div style="font-size:10px;color:var(--t3)">progress saved</div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="padding:18px 20px;display:flex;gap:10px">
+          <button onclick="closeModal('modal-logout')" style="flex:1;padding:12px 18px;border-radius:10px;background:var(--ink3);border:1px solid var(--bd);color:var(--t1);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s" onmouseenter="this.style.borderColor='var(--jade)'" onmouseleave="this.style.borderColor='var(--bd)'">Stay Here</button>
+          <button onclick="confirmLogout()" style="flex:1;padding:12px 18px;border-radius:10px;background:var(--coral);color:#fff;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .22s" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(255,107,107,.3)'" onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='none'">Yes, Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ LOGOUT SUCCESS SCREEN (kept for reLogin entry point only) ══════════ -->
+  <div id="logged-out-screen" style="display:none;position:fixed;inset:0;z-index:600;background:var(--ink);align-items:center;justify-content:center;flex-direction:column;gap:20px">>
+    <div style="text-align:center;animation:fadeUp .5s ease">
+      <div style="font-size:64px;margin-bottom:16px;animation:float 3s ease-in-out infinite">👋</div>
+      <div style="font-family:var(--fd);font-size:28px;font-weight:800;color:var(--t1);margin-bottom:8px">See you soon!</div>
+      <p style="color:var(--t2);font-size:15px;margin-bottom:28px">Your progress has been saved.<br>Keep up the great work!</p>
+      <button onclick="reLogin()" style="padding:14px 36px;border-radius:12px;background:var(--jade);color:#0b0e17;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:all .25s" onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(0,229,160,.3)'" onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+        Login Again ⚡
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h2 class="page-title" id="dash-greeting">Welcome back! 👋</h2>
+        <p class="page-subtitle" id="dash-date"></p>
+      </div>
+      <div class="grid-4 mb-16" id="kpi-row"></div>
+      <div class="grid-2-3 mb-16">
+        <div class="card">
+          <div class="card-title">Subject Progress</div>
+          <div id="subj-progress-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Performance Overview</div>
+          <div id="perf-overview"></div>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">⚠️ Needs Revision</div>
+          <div id="weak-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💪 Strong Areas</div>
+          <div id="strong-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🕐 Recent Tests</div>
+          <div id="recent-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SYLLABUS ═══ -->
+    <div id="page-syllabus" class="page">
+      <div class="page-header">
+        <h2 class="page-title">Syllabus</h2>
+        <p class="page-subtitle" id="syl-subtitle">Class 10 · CBSE Board</p>
+      </div>
+      <div class="subject-tabs" id="syl-tabs"></div>
+      <div id="syl-chapters"></div>
+    </div>
+
+    <!-- ═══ PRACTICE ═══ -->
+    <div id="page-practice" class="page">
+      <div id="prac-select">
+        <div class="page-header">
+          <h2 class="page-title">Practice Center</h2>
+          <p class="page-subtitle">AI-generated questions · Adaptive difficulty</p>
+        </div>
+        <div class="practice-select-grid">
+          <div class="card">
+            <div class="card-title">1. Subject</div>
+            <div id="prac-subj-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">2. Chapter</div>
+            <div class="ch-select-list" id="prac-ch-list"></div>
+            <div id="prac-ch-preview" class="hidden">
+              <div class="ch-preview" id="ch-preview-info"></div>
+              <button class="btn btn-primary btn-full" onclick="startGenerate()">✨ Generate AI Test</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="prac-generating" class="hidden loading-screen">
+        <div style="font-size:54px;margin-bottom:14px;animation:float 2s ease-in-out infinite">🤖</div>
+        <h3 class="font-display" style="font-size:20px;color:var(--t1);margin-bottom:8px">AI crafting your test...</h3>
+        <p style="color:var(--t2);font-size:14px;margin-bottom:20px">Generating questions for <strong class="text-jade" id="gen-ch-name">chapter</strong></p>
+        <div class="spinner"></div>
+        <p style="color:var(--t3);font-size:12px;margin-top:14px">Calibrating difficulty · Analyzing syllabus content</p>
+      </div>
+
+      <div id="prac-ready" class="hidden" style="max-width:540px">
+        <div class="card glow-jade ready-card">
+          <div style="font-size:50px;margin-bottom:12px">📋</div>
+          <h3 class="font-display" style="font-size:21px;font-weight:800;color:var(--t1);margin-bottom:5px" id="ready-title">Chapter Name</h3>
+          <p style="color:var(--t2);font-size:13px;margin-bottom:8px" id="ready-meta">Subject · Class · Board</p>
+          <span id="ready-badge" class="badge mb-20" style="background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.3)">✨ AI-generated</span>
+          <div class="ready-grid" id="ready-stats"></div>
+          <div style="padding:13px;background:var(--ink3);border-radius:11px;margin-bottom:22px;border:1px solid var(--bd)">
+            <div class="info-row"><span class="info-key">Est. Duration</span><span class="info-val" id="ready-time">—</span></div>
+            <div class="info-row"><span class="info-key">Pass Threshold</span><span class="info-val text-jade">60% marks</span></div>
+            <div class="info-row" style="margin-bottom:0"><span class="info-key">Total Marks</span><span class="info-val" id="ready-marks">—</span></div>
+          </div>
+          <div class="flex gap-10">
+            <button class="btn btn-ghost" style="flex:1" onclick="showPracPhase('select')">← Back</button>
+            <button class="btn btn-primary btn-lg" style="flex:2" onclick="beginTest()">Start Test 🚀</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="prac-active" class="hidden" style="max-width:660px">
+        <div class="quiz-progress-wrap">
+          <div class="quiz-progress-meta">
+            <div class="flex items-center gap-8">
+              <span class="font-mono" style="font-size:13px;color:var(--t2)" id="q-counter">Q1/12</span>
+              <span class="badge" id="q-diff-badge">Easy</span>
+              <span class="badge" id="q-marks-badge" style="background:rgba(255,255,255,.06);color:var(--t3);border:none">1 mark</span>
+            </div>
+            <div class="flex items-center gap-8">
+              <span class="font-mono" style="font-size:13px;color:var(--t2)" id="q-timer">⏱ 0s</span>
+              <span class="font-mono" style="font-size:10px;color:var(--t3)" id="q-exp-time">/30s</span>
+            </div>
+          </div>
+          <div class="quiz-track"><div class="quiz-fill" id="q-prog" style="width:0%"></div></div>
+        </div>
+        <div class="card" id="q-card">
+          <div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.06em;margin-bottom:7px" id="q-topic-label">TOPIC</div>
+          <div class="question-text" id="q-text">Question text</div>
+          <div id="q-options"></div>
+          <div id="q-next-btn" class="hidden" style="display:none;justify-content:flex-end;margin-top:14px">
+            <button class="btn btn-primary" onclick="nextQuestion()">Next →</button>
+          </div>
+        </div>
+        <div class="q-map" id="q-map"></div>
+      </div>
+
+      <div id="prac-result" class="hidden">
+        <div class="grid-2 mb-16">
+          <div class="card glow-jade" style="padding:26px" id="result-score-card">
+            <div class="flex justify-between items-center mb-16">
+              <div>
+                <div class="result-score" id="result-pct">0%</div>
+                <div style="color:var(--t2);font-size:13px;margin-top:4px" id="result-detail">0/0 marks</div>
+              </div>
+              <span style="font-size:46px" id="result-emoji">📖</span>
+            </div>
+            <div class="result-status" id="result-status-box">Calculating...</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Performance Breakdown</div>
+            <div class="radial-row" id="result-radials"></div>
+            <div id="result-bars"></div>
+            <div style="font-size:11px;color:var(--t2);margin-top:7px" id="result-time-info"></div>
+          </div>
+        </div>
+        <div class="ai-insight mb-16" id="result-ai">
+          <div class="ai-icon-box">🤖</div>
+          <div>
+            <div style="color:var(--violet);font-weight:700;font-size:11px;letter-spacing:.07em;margin-bottom:7px">AI LEARNING INSIGHT</div>
+            <div id="ai-insight-text" style="color:var(--t1);font-size:13px;line-height:1.7"></div>
+          </div>
+        </div>
+        <div class="card mb-16">
+          <div class="card-title">Question Review</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px" id="result-q-review"></div>
+        </div>
+        <div class="flex gap-10">
+          <button class="btn btn-ghost btn-lg" onclick="showPracPhase('select')">← Choose Chapter</button>
+          <button class="btn btn-secondary btn-lg" onclick="retryTest()">Retry 🔄</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ANALYTICS ═══ -->
+    <div id="page-analytics" class="page">
+      <div class="page-header">
+        <h2 class="page-title">Analytics</h2>
+        <p class="page-subtitle" id="ana-subtitle">Performance insights</p>
+      </div>
+      <div class="grid-4 mb-16" id="ana-kpis"></div>
+      <div class="grid-2-3 mb-16">
+        <div class="card">
+          <div class="card-title">Test Timeline</div>
+          <div id="ana-timeline"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Subject Breakdown</div>
+          <div id="ana-subject"></div>
+        </div>
+      </div>
+      <div class="card mb-16">
+        <div class="card-title" style="margin-bottom:4px">Chapter Performance Map</div>
+        <p style="font-size:12px;color:var(--t3);margin-bottom:13px">Each cell = one chapter (hover for details)</p>
+        <div class="heatmap-grid" id="ana-heatmap"></div>
+        <div class="heat-legend mt-12">
+          <div class="heat-legend-item"><div class="heat-swatch" style="background:rgba(44,49,72,.8);border:1px solid var(--bd)"></div>Not attempted</div>
+          <div class="heat-legend-item"><div class="heat-swatch" style="background:rgba(255,107,107,.4);border:1px solid var(--coral)"></div>&lt;50%</div>
+          <div class="heat-legend-item"><div class="heat-swatch" style="background:rgba(255,185,48,.4);border:1px solid var(--amber)"></div>50–70%</div>
+          <div class="heat-legend-item"><div class="heat-swatch" style="background:rgba(0,229,160,.4);border:1px solid var(--jade)"></div>≥70%</div>
+        </div>
+      </div>
+      <div class="card glow-violet">
+        <div class="card-title">🤖 AI Learning Pattern Analysis</div>
+        <div class="grid-3" id="ana-patterns"></div>
+      </div>
+    </div>
+
+    <!-- ═══ REPORTS ═══ -->
+    <div id="page-reports" class="page">
+      <div class="page-header">
+        <h2 class="page-title">Reports</h2>
+        <p class="page-subtitle">AI-generated insights & analysis</p>
+      </div>
+      <div class="grid-4 mb-16" id="rep-kpis"></div>
+      <div class="grid-1-15">
+        <div>
+          <div class="card-title mb-12">Generate Report</div>
+          <div id="rep-type-list">
+            <div class="report-type-card" onclick="generateReport('progress',this)"><div class="report-type-title">📈 Progress Report</div><div class="report-type-desc">Overall learning journey</div></div>
+            <div class="report-type-card" onclick="generateReport('subject',this)"><div class="report-type-title">📚 Subject Analysis</div><div class="report-type-desc">Subject-wise deep dive</div></div>
+            <div class="report-type-card" onclick="generateReport('improvement',this)"><div class="report-type-title">🎯 Improvement Plan</div><div class="report-type-desc">What to focus on next</div></div>
+            <div class="report-type-card" onclick="generateReport('parent',this)"><div class="report-type-title">👨‍👩‍👧 Parent Summary</div><div class="report-type-desc">Simple overview for parents</div></div>
+            <div class="report-type-card" onclick="generateReport('exam',this)"><div class="report-type-title">🏆 Exam Strategy</div><div class="report-type-desc">Personalized exam guide</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="card-title mb-12" id="rep-output-title">Report Output</div>
+          <div class="card glow-violet report-content-box" id="rep-output">
+            <div class="text-center" style="padding:56px">
+              <div style="font-size:38px;margin-bottom:12px">📋</div>
+              <p style="color:var(--t2);font-size:14px">Select a report type to generate AI insights</p>
+            </div>
+          </div>
+          <div class="card mt-12" id="rep-ch-table" style="margin-top:12px">
+            <div class="card-title">Chapter-wise Performance</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px" id="rep-ch-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA LAYER
+// ═══════════════════════════════════════════════════════════
+const SYLLABUS = {
+  CBSE:{
+    8:{
+      Mathematics:{icon:"∑",color:"#00e5a0",chapters:[
+        {id:"c8m1",name:"Rational Numbers",topics:["Properties","Number Line","Operations","Word Problems"],concepts:["Commutativity","Associativity","Distributivity","Additive Identity"]},
+        {id:"c8m2",name:"Linear Equations",topics:["Forming","Solving","Applications","Reducible Forms"],concepts:["Variable","Coefficient","Transposition","Cross Multiplication"]},
+        {id:"c8m3",name:"Quadrilaterals",topics:["Polygons","Parallelogram","Special Shapes","Kite"],concepts:["Angle Sum","Diagonal Properties","Congruence","Area"]},
+        {id:"c8m4",name:"Data Handling",topics:["Organizing","Grouping","Circle Graphs","Probability"],concepts:["Frequency","Histogram","Bar Graph","Pie Chart"]},
+        {id:"c8m5",name:"Squares & Square Roots",topics:["Properties","Finding Root","Pythagorean Triplets"],concepts:["Perfect Square","Prime Factorisation","Long Division"]},
+      ]},
+      Science:{icon:"⚗",color:"#38bdf8",chapters:[
+        {id:"c8s1",name:"Crop Production",topics:["Agricultural Practices","Soil Prep","Irrigation"],concepts:["Kharif","Rabi","Fertiliser","Pesticide"]},
+        {id:"c8s2",name:"Microorganisms",topics:["Types","Friendly","Harmful","Preservation"],concepts:["Bacteria","Fungi","Protozoa","Virus","Antibiotic"]},
+        {id:"c8s3",name:"Cell Structure",topics:["Discovery","Plant vs Animal","Unicellular vs Multi"],concepts:["Membrane","Cytoplasm","Nucleus","Organelles"]},
+        {id:"c8s4",name:"Combustion & Flame",topics:["Types","Structure","Fire Control"],concepts:["Ignition Temp","Inflammable","Calorific Value"]},
+      ]},
+      English:{icon:"✍",color:"#a78bfa",chapters:[
+        {id:"c8e1",name:"Grammar – Tenses",topics:["Present","Past","Future","Perfect"],concepts:["Simple","Continuous","Perfect","Auxiliary"]},
+        {id:"c8e2",name:"Grammar – Voice",topics:["Active","Passive","Transformation"],concepts:["Subject","Object","Verb Forms","By-phrase"]},
+        {id:"c8e3",name:"Essay Writing",topics:["Introduction","Body","Conclusion","Types"],concepts:["Thesis","Topic Sentence","Coherence"]},
+      ]},
+    },
+    10:{
+      Mathematics:{icon:"∑",color:"#00e5a0",chapters:[
+        {id:"c10m1",name:"Real Numbers",topics:["Euclid's Lemma","Fundamental Theorem","Irrational","Decimal Expansions"],concepts:["HCF","LCM","Terminating","Non-Terminating"]},
+        {id:"c10m2",name:"Polynomials",topics:["Geometrical Meaning","Zeroes & Coefficients","Division Algorithm"],concepts:["Quadratic","Cubic","Zeroes","Coefficients"]},
+        {id:"c10m3",name:"Linear Equations",topics:["Graphical","Substitution","Elimination","Cross-Multiplication"],concepts:["Consistent","Inconsistent","Dependent","Unique"]},
+        {id:"c10m4",name:"Quadratic Equations",topics:["Factorisation","Completing Square","Formula","Nature of Roots"],concepts:["Discriminant","Real Roots","Equal Roots"]},
+        {id:"c10m5",name:"Arithmetic Progressions",topics:["nth Term","Sum of AP","Applications"],concepts:["Common Difference","First Term","Sum Formula"]},
+        {id:"c10m6",name:"Triangles",topics:["Similarity","BPT","Criteria","Pythagoras"],concepts:["AAA","SSS","SAS","Proportionality"]},
+        {id:"c10m7",name:"Coordinate Geometry",topics:["Distance","Section Formula","Area"],concepts:["Midpoint","Centroid","Collinear"]},
+        {id:"c10m8",name:"Trigonometry",topics:["Ratios","Standard Angles","Complementary","Identities"],concepts:["Sin","Cos","Tan","Cosec","Sec","Cot"]},
+        {id:"c10m9",name:"Statistics",topics:["Mean","Median","Mode","Cumulative Frequency"],concepts:["Grouped Data","Direct Method","Ogive"]},
+        {id:"c10m10",name:"Probability",topics:["Classical","Compound Events","Complementary"],concepts:["Sample Space","Favourable","Theoretical"]},
+      ]},
+      Science:{icon:"⚗",color:"#38bdf8",chapters:[
+        {id:"c10s1",name:"Chemical Reactions",topics:["Equations","Types","Oxidation"],concepts:["Balancing","Combination","Decomposition","Redox"]},
+        {id:"c10s2",name:"Acids Bases Salts",topics:["Indicators","Reactions","pH Scale"],concepts:["Litmus","Neutralisation","Buffer","pH"]},
+        {id:"c10s3",name:"Metals & Non-Metals",topics:["Properties","Reactivity Series","Corrosion"],concepts:["Electropositive","Ionic Bond","Alloys"]},
+        {id:"c10s4",name:"Life Processes",topics:["Nutrition","Respiration","Transportation","Excretion"],concepts:["Photosynthesis","Stomata","Glycolysis","Nephron"]},
+        {id:"c10s5",name:"Electricity",topics:["Current","Resistance","Ohm's Law","Circuits"],concepts:["Coulomb","Volt","Ohm","Ampere","Power"]},
+        {id:"c10s6",name:"Magnetic Effects",topics:["Field","EM Induction","Motor","Generator"],concepts:["Fleming","Solenoid","Electromagnet","AC","DC"]},
+      ]},
+      Social_Science:{icon:"🌍",color:"#ffb930",chapters:[
+        {id:"c10ss1",name:"Resources & Development",topics:["Types","Land","Soil","Conservation"],concepts:["Biotic","Abiotic","Renewable","Non-Renewable"]},
+        {id:"c10ss2",name:"Nationalism in India",topics:["Non-Cooperation","Civil Disobedience"],concepts:["Satyagraha","Boycott","Salt March"]},
+        {id:"c10ss3",name:"Power Sharing",topics:["Why Share","Forms"],concepts:["Federal","Unitary","Coalition"]},
+        {id:"c10ss4",name:"Money & Credit",topics:["Exchange","Banks","Formal vs Informal"],concepts:["Barter","Currency","Collateral","Interest"]},
+      ]},
+    },
+    12:{
+      Mathematics:{icon:"∑",color:"#00e5a0",chapters:[
+        {id:"c12m1",name:"Relations & Functions",topics:["Types of Relations","Types of Functions","Composition"],concepts:["Reflexive","Symmetric","Bijective","Injective"]},
+        {id:"c12m2",name:"Inverse Trigonometry",topics:["Definition","Range","Properties","Graphs"],concepts:["Arcsin","Arccos","Arctan","Principal Value"]},
+        {id:"c12m3",name:"Matrices",topics:["Order & Types","Operations","Transpose","Symmetric"],concepts:["Row","Column","Square","Identity","Invertible"]},
+        {id:"c12m4",name:"Determinants",topics:["Expansion","Properties","Cofactors","Applications"],concepts:["Sarrus","Singular","Cramer","Adjoint"]},
+        {id:"c12m5",name:"Continuity & Differentiability",topics:["Continuity","Differentiation","Log Diff","MVT"],concepts:["Limit","Chain Rule","Product Rule","Rolle's"]},
+        {id:"c12m6",name:"Application of Derivatives",topics:["Rate of Change","Increasing/Decreasing","Maxima/Minima"],concepts:["First Derivative","Critical Point","Inflection"]},
+        {id:"c12m7",name:"Integrals",topics:["Indefinite","Definite","By Parts","Substitution"],concepts:["Antiderivative","Fundamental Theorem","LIATE"]},
+        {id:"c12m8",name:"Vector Algebra",topics:["Types","Addition","Dot Product","Cross Product"],concepts:["Scalar","Vector","Unit Vector","Collinear"]},
+        {id:"c12m9",name:"3D Geometry",topics:["Direction Cosines","Line","Plane","Angles"],concepts:["Direction Ratios","Skew Lines","Distance"]},
+        {id:"c12m10",name:"Probability",topics:["Conditional","Bayes","Random Variable","Binomial"],concepts:["Conditional","Independence","PDF","CDF"]},
+      ]},
+      Physics:{icon:"⚡",color:"#38bdf8",chapters:[
+        {id:"c12p1",name:"Electric Charges & Fields",topics:["Charge","Coulomb's Law","Field","Gauss"],concepts:["Conservation","Superposition","Field Lines","Dipole"]},
+        {id:"c12p2",name:"Electrostatics",topics:["Potential","PE","Equipotential","Capacitance"],concepts:["Work","Conductor","Dielectric","Capacitor"]},
+        {id:"c12p3",name:"Current Electricity",topics:["Drift Velocity","Resistance","EMF","Kirchhoff"],concepts:["Ohm's Law","Resistivity","Potentiometer"]},
+        {id:"c12p4",name:"EM Induction",topics:["Faraday","Lenz","Motional EMF","Inductance"],concepts:["Flux","Self-Induction","Mutual","AC Generator"]},
+        {id:"c12p5",name:"Wave Optics",topics:["Huygens","Interference","Diffraction","Polarisation"],concepts:["Wavefront","Young's DSE","Fringe Width","Brewster"]},
+      ]},
+      Chemistry:{icon:"🧪",color:"#a78bfa",chapters:[
+        {id:"c12c1",name:"The Solid State",topics:["Types","Crystal Lattices","Unit Cell","Defects"],concepts:["Amorphous","Crystalline","BCC","FCC"]},
+        {id:"c12c2",name:"Electrochemistry",topics:["Cells","Nernst Equation","Conductance","Batteries"],concepts:["EMF","Galvanic","Standard Potential","Kohlrausch"]},
+        {id:"c12c3",name:"Chemical Kinetics",topics:["Rate","Factors","Order","Arrhenius"],concepts:["Rate Law","Constant","Half-Life","Molecularity"]},
+        {id:"c12c4",name:"Amines",topics:["Classification","Nomenclature","Preparation","Reactions"],concepts:["Primary","Secondary","Tertiary","Basicity"]},
+      ]},
+    }
+  },
+  ICSE:{
+    10:{
+      Mathematics:{icon:"∑",color:"#00e5a0",chapters:[
+        {id:"i10m1",name:"Commercial Mathematics",topics:["GST","Banking","Shares & Dividends"],concepts:["CGST","SGST","Recurring Deposit","Dividend"]},
+        {id:"i10m2",name:"Algebra – Quadratics",topics:["Roots","Discriminant","Completing Square"],concepts:["Sum of Roots","Product","Nature of Roots"]},
+        {id:"i10m3",name:"Circles",topics:["Chord Properties","Tangents","Arcs"],concepts:["Chord","Arc","Semicircle Angle","Alternate Segment"]},
+        {id:"i10m4",name:"Mensuration",topics:["Cylinder","Cone","Sphere","Hemisphere"],concepts:["Surface Area","Volume","Slant Height"]},
+        {id:"i10m5",name:"Statistics",topics:["Mean","Median","Mode","Ogive"],concepts:["Grouped Data","Quartiles","Percentile"]},
+      ]},
+      Science:{icon:"⚗",color:"#38bdf8",chapters:[
+        {id:"i10s1",name:"Periodic Table",topics:["Mendeleev","Modern Law","Periods & Groups"],concepts:["Atomic Number","Configuration","Valence"]},
+        {id:"i10s2",name:"Chemical Bonding",topics:["Ionic","Covalent","Properties"],concepts:["Electrovalent","Octet","Lewis Structure"]},
+        {id:"i10s3",name:"Electricity",topics:["Ohm's Law","Resistors","Power","Domestic"],concepts:["Current","Voltage","Resistance","Fuse"]},
+      ]},
+    }
+  },
+  "State Board":{
+    9:{
+      Mathematics:{icon:"∑",color:"#00e5a0",chapters:[
+        {id:"sb9m1",name:"Real Numbers",topics:["Natural","Integers","Rational","Irrational"],concepts:["Number Line","Density","Closure"]},
+        {id:"sb9m2",name:"Polynomials",topics:["Definition","Types","Operations","Factorisation"],concepts:["Monomial","Binomial","Degree","Zeros"]},
+        {id:"sb9m3",name:"Linear Equations",topics:["One Variable","Two Variables","Graphical"],concepts:["Solution","Graph","Intercepts","Slope"]},
+      ]},
+      Science:{icon:"⚗",color:"#38bdf8",chapters:[
+        {id:"sb9s1",name:"Our Environment",topics:["Ecosystem","Food Chain","Biodegradable"],concepts:["Producer","Consumer","Decomposer"]},
+        {id:"sb9s2",name:"Natural Resources",topics:["Air","Water","Soil","Cycles"],concepts:["Atmosphere","Hydrosphere","Pollution"]},
+      ]},
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// QUESTION BANK (mock data for HTML demo)
+// ═══════════════════════════════════════════════════════════
+function buildQuestions(chapterName, topics) {
+  const diffs = ["Easy","Easy","Easy","Easy","Medium","Medium","Medium","Medium","Hard","Hard","Hard","Hard"];
+  const qs = [
+    {text:`What is the fundamental concept underlying "${chapterName}"?`, opts:["Core definition applies here","This is a common misconception","Partially correct but incomplete","This reverses the concept"], ci:0},
+    {text:`Which property is MOST characteristic of the topics in "${chapterName}"?`, opts:["Correct — this property holds","Incorrect — this violates the rule","True only in special cases","This is the opposite of true"], ci:0},
+    {text:`In "${chapterName}", which statement about ${topics[0]||"the main concept"} is correct?`, opts:["This accurately describes it","This is an incorrect interpretation","This confuses two concepts","This is a partial answer only"], ci:0},
+    {text:`A student claims: "${topics[1]||topics[0]} always follows the basic rule." Is this true?`, opts:["Yes — the rule always holds","No — exceptions exist in all cases","Only under specific conditions","The claim is irrelevant"], ci:0},
+    {text:`Apply the concept of ${topics[0]||"the main topic"} from "${chapterName}" to solve a standard problem. Which approach is valid?`, opts:["Use direct formula application","Ignore boundary conditions","Apply inverse method only","Random trial and error"], ci:0},
+    {text:`What distinguishes ${topics[0]||"Topic A"} from ${topics[1]||"Topic B"} in "${chapterName}"?`, opts:["Key distinction: scope and application differ","They are essentially identical concepts","Only notation differs, not substance","One is always greater than the other"], ci:0},
+    {text:`Calculate the result involving ${topics[2]||topics[0]} in "${chapterName}". Which is correct?`, opts:["The derived formula gives exact answer","Approximation methods always work here","The result is always zero","No calculation is needed"], ci:0},
+    {text:`Which statement about ${topics[1]||"the key concept"} in "${chapterName}" is most accurate?`, opts:["Precision matters in all applications","Estimates are always sufficient","Only qualitative analysis needed","The concept has no real applications"], ci:0},
+    {text:`Critically evaluate: how does "${topics[0]||"the core concept"}" interconnect with other ideas in "${chapterName}"?`, opts:["Multiple deep connections exist and are well-defined","No meaningful connections exist","Only superficial links are present","The concepts are entirely independent"], ci:0},
+    {text:`A multi-step problem from "${chapterName}" requires applying ${topics[0]||"main concept"} and ${topics[1]||"second concept"} together. Which solution path is correct?`, opts:["Sequential application of both concepts","Apply only the simpler concept","Ignore one concept entirely","Both concepts contradict each other"], ci:0},
+    {text:`Prove or evaluate: an advanced property of ${topics[2]||topics[0]} from "${chapterName}". Which conclusion is valid?`, opts:["The property holds under stated conditions","The property always fails","It's undefined in all cases","Proof by contradiction invalidates it"], ci:0},
+    {text:`Expert-level synthesis: select the most comprehensive understanding of "${chapterName}" as a whole.`, opts:["All concepts interrelate to form complete understanding","Topics are isolated and unrelated","Only memorization matters, not understanding","Advanced topics contradict basic ones"], ci:0},
+  ];
+  const DT = {Easy:30,Medium:60,Hard:120};
+  const DM = {Easy:1,Medium:2,Hard:3};
+  return qs.map((q,i) => {
+    const diff = diffs[i];
+    return {
+      id:`q${i+1}`, text:q.text, difficulty:diff,
+      topic: topics[i%topics.length],
+      options: q.opts.map((o,idx) => ({label:["A","B","C","D"][idx], text:o, isCorrect:idx===q.ci})),
+      correctIndex: q.ci, expectedTime: DT[diff], marks: DM[diff]
+    };
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// DEMO STATE (pre-loaded with mock performance data)
+// ═══════════════════════════════════════════════════════════
+let student = null;
+let chapterStats = {};
+let allResults = [];
+let currentBoard = "", currentCls = 0;
+let activeSyllabus = {};
+let activePage = "dashboard";
+let selectedAvatar = "🦁";
+let selectedBoard = "";
+let selectedClass = "";
+
+// PRACTICE STATE
+let pracSubj = "", pracCh = null, pracQuestions = [], pracQIdx = 0, pracAnswers = {};
+let qTimerInterval = null, qElapsed = 0, totalElapsed = 0;
+
+// MOCK DATA INJECTED AFTER ENROLLMENT
+function injectMockData() {
+  const subs = Object.keys(activeSyllabus);
+  const allChs = subs.flatMap(s => activeSyllabus[s].chapters.map(c => ({...c, subject:s})));
+  
+  // Initialize all
+  allChs.forEach(ch => { chapterStats[ch.id] = {attempts:0, bestScore:0, completed:false}; });
+
+  // Mark some as completed/attempted
+  const completed = allChs.slice(0, Math.max(2, Math.floor(allChs.length * 0.35)));
+  const attempted = allChs.slice(completed.length, completed.length + Math.max(2, Math.floor(allChs.length * 0.2)));
+
+  completed.forEach((ch, i) => {
+    const score = 65 + Math.floor(Math.random() * 30);
+    chapterStats[ch.id] = {attempts: 1 + Math.floor(Math.random()*2), bestScore: score, completed: true, lastScore: score};
+    allResults.push({
+      subject: ch.subject, chapterName: ch.name, chapterId: ch.id,
+      timestamp: Date.now() - (completed.length-i)*86400000,
+      metrics: {
+        accuracy: score - 5 + Math.floor(Math.random()*10),
+        speedScore: 55 + Math.floor(Math.random()*35),
+        performanceScore: score,
+        correct: Math.floor(score/10), total: 12,
+        avgTime: 25 + Math.floor(Math.random()*40),
+        markPct: score, earned: Math.floor(score*20/100), totalMarks: 20,
+        passed: true, easyAcc: 70+Math.floor(Math.random()*25),
+        medAcc: 55+Math.floor(Math.random()*30), hardAcc: 35+Math.floor(Math.random()*35)
+      },
+      answers: {}, questions: ch.topics.map((t,i)=>({id:`q${i}`,text:"...",difficulty:["Easy","Medium","Hard"][i%3],topic:t}))
+    });
+  });
+
+  attempted.forEach((ch, i) => {
+    const score = 30 + Math.floor(Math.random()*25);
+    chapterStats[ch.id] = {attempts: 1+Math.floor(Math.random()*2), bestScore: score, completed: false};
+    allResults.push({
+      subject: ch.subject, chapterName: ch.name, chapterId: ch.id,
+      timestamp: Date.now() - (i+1)*3600000,
+      metrics: {
+        accuracy: score, speedScore: 40+Math.floor(Math.random()*30),
+        performanceScore: score-5, correct: Math.floor(score/10), total: 12,
+        avgTime: 50+Math.floor(Math.random()*40),
+        markPct: score, earned: Math.floor(score*20/100), totalMarks: 20,
+        passed: false, easyAcc: 50+Math.floor(Math.random()*20),
+        medAcc: 30+Math.floor(Math.random()*25), hardAcc: 15+Math.floor(Math.random()*20)
+      },
+      answers: {}, questions: []
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTH — USER DATABASE (in-memory)
+// ═══════════════════════════════════════════════════════════
+const USERS_DB = {
+  'demo@eduai.in': { password:'demo123', name:'Demo Student', avatar:'🚀', board:'CBSE', cls:10 }
+};
+
+// Register form temp state
+let regAvatar = '🦁', regBoard = '', regClass = '';
+
+// ── Navigation between auth panels ──
+function showAuth(panel) {
+  ['auth-landing','auth-login','auth-register'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.display = 'none';
+  });
+  const target = document.getElementById('auth-' + panel);
+  target.style.display = '';
+  target.style.animation = 'fadeUp .35s ease';
+  // reset errors on switch
+  if (panel === 'login') {
+    document.getElementById('li-err-general').style.display = 'none';
+    document.getElementById('li-err-email').style.display = 'none';
+    document.getElementById('li-err-pass').style.display = 'none';
+  }
+  if (panel === 'register') regGoStep(1);
+}
+
+// ── Show auth screen (called on logout / page load) ──
+function showLoginScreen() {
+  // reset state
+  student = null; chapterStats = {}; allResults = [];
+  selectedAvatar = '🦁'; selectedBoard = ''; selectedClass = '';
+  menuOpen = false; regAvatar = '🦁'; regBoard = ''; regClass = '';
+  pracSubj = ''; pracCh = null; pracQuestions = []; pracQIdx = 0; pracAnswers = {};
+  clearInterval(qTimerInterval);
+
+  // reset nav
+  document.querySelectorAll('.nav-item').forEach((n,i) => n.classList.toggle('active', i===0));
+
+  // show landing panel inside auth screen
+  showAuth('landing');
+
+  const es = document.getElementById('auth-screen');
+  es.style.opacity = '0';
+  es.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    es.style.transition = 'opacity .45s ease';
+    es.style.opacity = '1';
+  }));
+}
+
+// ══════════════════════════════
+// LOGIN
+// ══════════════════════════════
+function fillDemo() {
+  document.getElementById('li-email').value = 'demo@eduai.in';
+  document.getElementById('li-pass').value = 'demo123';
+}
+
+function togglePass(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+function doLogin() {
+  const email = document.getElementById('li-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('li-pass').value;
+  const errG  = document.getElementById('li-err-general');
+  errG.style.display = 'none';
+
+  if (!email) { showErr('li-err-email','Email is required'); return; }
+  if (!email.includes('@')) { showErr('li-err-email','Enter a valid email'); return; }
+  hideErr('li-err-email');
+  if (!pass) { showErr('li-err-pass','Password is required'); return; }
+  hideErr('li-err-pass');
+
+  const user = USERS_DB[email];
+  if (!user) {
+    errG.textContent = '❌ No account found with this email. Please register first.';
+    errG.style.display = 'block'; return;
+  }
+  if (user.password !== pass) {
+    errG.textContent = '❌ Wrong password. Please try again.';
+    errG.style.display = 'block'; return;
+  }
+
+  // Login success — launch app
+  launchApp({ name:user.name, email:email, avatar:user.avatar, board:user.board, cls:user.cls });
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideErr(id) { document.getElementById(id).style.display = 'none'; }
+
+// ══════════════════════════════
+// REGISTER — 3-step flow
+// ══════════════════════════════
+function regSelectAvatar(btn, av) {
+  regAvatar = av;
+  document.querySelectorAll('#reg-avatar-grid .avatar-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function regSelectBoard(btn, board) {
+  regBoard = board;
+  document.querySelectorAll('#reg-board-grid .board-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('reg-err-board').style.display = 'none';
+  const classes = Object.keys(SYLLABUS[board]).map(Number).sort();
+  document.getElementById('reg-class-grid').innerHTML = classes.map(c =>
+    `<button class="class-btn" onclick="regSelectClass(this,${c})">${c}</button>`
+  ).join('');
+  document.getElementById('reg-class-group').style.opacity = '1';
+  document.getElementById('reg-class-group').style.pointerEvents = 'auto';
+  regClass = '';
+  document.getElementById('reg-syllabus-preview').style.display = 'none';
+}
+
+function regSelectClass(btn, cls) {
+  regClass = String(cls);
+  document.querySelectorAll('#reg-class-grid .class-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('reg-err-class').style.display = 'none';
+  const syl = SYLLABUS[regBoard][cls];
+  document.getElementById('reg-syllabus-tags').innerHTML = Object.keys(syl).map(s => {
+    const c = syl[s].color || '#00e5a0';
+    return `<span style="background:${c}18;color:${c};border:1px solid ${c}30;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:500">${s.replace('_',' ')}</span>`;
+  }).join('');
+  document.getElementById('reg-syllabus-preview').style.display = 'block';
+}
+
+function regGoStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('reg-step'+i).style.display = i===n ? '' : 'none';
+  });
+  // Update dots
+  const dotConfigs = [
+    ['28px','8px','8px'],
+    ['8px','28px','8px'],
+    ['8px','8px','28px']
+  ];
+  ['reg-dot1','reg-dot2','reg-dot3'].forEach((id,i) => {
+    const dot = document.getElementById(id);
+    dot.style.width = dotConfigs[n-1][i];
+    dot.style.background = i < n ? 'var(--jade)' : 'var(--bd)';
+  });
+  document.getElementById('reg-step-label').textContent = `Step ${n} of 3`;
+}
+
+function regStep1Next() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('reg-pass').value;
+  let ok = true;
+
+  if (!name)  { showErr('reg-err-name','Name is required'); ok=false; }
+  else hideErr('reg-err-name');
+
+  if (!email.includes('@')) { showErr('reg-err-email','Enter a valid email'); ok=false; }
+  else if (USERS_DB[email]) { showErr('reg-err-email','An account with this email already exists'); ok=false; }
+  else hideErr('reg-err-email');
+
+  if (pass.length < 6) { showErr('reg-err-pass','Password must be at least 6 characters'); ok=false; }
+  else hideErr('reg-err-pass');
+
+  if (!ok) return;
+
+  // Move to step 2
+  document.getElementById('reg-step2-avatar').textContent = regAvatar;
+  document.getElementById('reg-step2-name').textContent = name.split(' ')[0];
+  regGoStep(2);
+}
+
+function regStep2Next() {
+  let ok = true;
+  if (!regBoard) { document.getElementById('reg-err-board').style.display='block'; ok=false; }
+  if (!regClass) { document.getElementById('reg-err-class').style.display='block'; ok=false; }
+  if (!ok) return;
+
+  // Populate confirm screen (step 3)
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const syl   = SYLLABUS[regBoard][parseInt(regClass)];
+
+  document.getElementById('reg-confirm-avatar').textContent = regAvatar;
+  document.getElementById('reg-confirm-name').textContent   = name;
+  document.getElementById('reg-confirm-email').textContent  = email;
+  document.getElementById('reg-confirm-board').textContent  = regBoard;
+  document.getElementById('reg-confirm-class').textContent  = 'Class ' + regClass;
+  document.getElementById('reg-confirm-subjects').innerHTML = Object.keys(syl).map(s => {
+    const c = syl[s].color || '#00e5a0';
+    return `<span style="background:${c}18;color:${c};border:1px solid ${c}30;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:500">${syl[s].icon} ${s.replace('_',' ')}</span>`;
+  }).join('');
+  regGoStep(3);
+}
+
+function finishRegister() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('reg-pass').value;
+
+  // Save to in-memory DB
+  USERS_DB[email] = { password:pass, name:name, avatar:regAvatar, board:regBoard, cls:parseInt(regClass) };
+
+  // Launch app immediately
+  launchApp({ name:name, email:email, avatar:regAvatar, board:regBoard, cls:parseInt(regClass) });
+}
+
+// Password strength indicator
+document.addEventListener('DOMContentLoaded', () => {
+  const passInput = document.getElementById('reg-pass');
+  if (passInput) {
+    passInput.addEventListener('input', () => {
+      const v = passInput.value;
+      const bar = document.getElementById('pass-strength-bar');
+      const lbl = document.getElementById('pass-strength-label');
+      if (!v) { bar.style.width='0%'; lbl.textContent=''; return; }
+      let score = 0;
+      if (v.length >= 6) score++;
+      if (v.length >= 10) score++;
+      if (/[A-Z]/.test(v)) score++;
+      if (/[0-9]/.test(v)) score++;
+      if (/[^A-Za-z0-9]/.test(v)) score++;
+      const configs = [
+        {w:'20%', c:'#ff6b6b', l:'Weak'},
+        {w:'40%', c:'#ff6b6b', l:'Weak'},
+        {w:'60%', c:'#ffb930', l:'Fair'},
+        {w:'80%', c:'#ffb930', l:'Good'},
+        {w:'100%',c:'#00e5a0', l:'Strong'},
+      ];
+      const cfg = configs[Math.min(score, configs.length-1)];
+      bar.style.width = cfg.w; bar.style.background = cfg.c;
+      lbl.textContent = cfg.l; lbl.style.color = cfg.c;
+    });
+  }
+});
+
+// ══════════════════════════════
+// LAUNCH APP (shared by login + register)
+// ══════════════════════════════
+function launchApp(profile) {
+  student = profile;
+  currentBoard = profile.board;
+  currentCls   = profile.cls;
+  activeSyllabus = SYLLABUS[currentBoard][currentCls];
+  chapterStats = {}; allResults = [];
+  injectMockData();
+
+  const auth = document.getElementById('auth-screen');
+  auth.style.transition = 'opacity .45s ease';
+  auth.style.opacity = '0';
+  setTimeout(() => {
+    auth.style.display = 'none';
+    auth.style.opacity = '1';
+    auth.style.transition = '';
+    document.getElementById('app').style.display = 'flex';
+    initApp();
+  }, 450);
+}
+
+// ═══════════════════════════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════════════════════════
+function initApp() {
+  updateSidebar();
+  renderDashboard();
+  renderSyllabus();
+  renderPracticeSelect();
+  renderAnalytics();
+  renderReports();
+}
+
+function updateSidebar() {
+  document.getElementById('sb-avatar').textContent = student.avatar;
+  document.getElementById('sb-name').textContent = student.name;
+  document.getElementById('sb-meta').textContent = `Class ${student.cls} · ${student.board}`;
+  updateUserMenuDisplay();
+  updateProgress();
+}
+
+function updateProgress() {
+  const all = Object.values(chapterStats);
+  const total = all.length;
+  const done = all.filter(s => s.completed).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('sb-pct').textContent = pct + '%';
+  document.getElementById('sb-prog').style.width = pct + '%';
+  document.getElementById('sb-count').textContent = `${done}/${total} chapters`;
+}
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  activePage = id;
+  if (id === 'analytics') refreshAnalytics();
+  if (id === 'reports') refreshReports();
+}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function makeRadial(value, size, color, label) {
+  const r = (size - 10) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (Math.max(0, Math.min(100, value)) / 100) * circ;
+  return `<div class="radial-wrap">
+    <svg width="${size}" height="${size}" style="overflow:visible">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#2c3148" stroke-width="6"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="6"
+        stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"
+        style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.1s ease"/>
+      <text x="50%" y="50%" text-anchor="middle" dy=".35em" fill="${color}"
+        font-size="${size<80?12:15}" font-weight="700" font-family="Syne,sans-serif">${value}%</text>
+    </svg>
+    ${label ? `<div class="radial-label">${label}</div>` : ''}
+  </div>`;
+}
+
+function makeBar(value, color, label, right, h=6) {
+  return `<div class="bar-wrap">
+    ${(label||right) ? `<div class="bar-meta">${label?`<span class="bar-label">${label}</span>`:''} ${right?`<span class="bar-val">${right}</span>`:''}</div>` : ''}
+    <div class="bar-track" style="height:${h}px">
+      <div class="bar-fill" style="width:${Math.max(0,Math.min(100,value))}%;background:${color};height:${h}px"></div>
+    </div>
+  </div>`;
+}
+
+function makeBadge(text, color) {
+  return `<span class="badge" style="background:${color}18;color:${color};border:1px solid ${color}30">${text}</span>`;
+}
+
+function makeTag(text, color) {
+  return `<span class="tag" style="background:${color}15;color:${color};border:1px solid ${color}28">${text}</span>`;
+}
+
+function avg(arr, key) {
+  if (!arr.length) return 0;
+  return Math.round(arr.reduce((s,r) => s + (r.metrics ? r.metrics[key] : r[key]), 0) / arr.length);
+}
+
+function getSubjColor(subj) {
+  return activeSyllabus[subj]?.color || '#00e5a0';
+}
+
+function getAllChapters() {
+  return Object.keys(activeSyllabus).flatMap(s => activeSyllabus[s].chapters.map(c => ({...c, subject:s})));
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD RENDER
+// ═══════════════════════════════════════════════════════════
+function renderDashboard() {
+  const subjects = Object.keys(activeSyllabus);
+  const allChs = getAllChapters();
+  const n = allResults.length;
+  const doneCh = Object.values(chapterStats).filter(s => s.completed).length;
+  const avgAcc = avg(allResults, 'accuracy');
+  const avgSpd = avg(allResults, 'speedScore');
+  const passRate = n > 0 ? Math.round((allResults.filter(r => r.metrics.passed).length / n) * 100) : 0;
+
+  document.getElementById('dash-greeting').textContent = `Welcome back, ${student.name.split(' ')[0]} ${student.avatar}`;
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-IN', {weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  // KPIs
+  const kpis = [
+    {l:'Chapters Done', v:`${doneCh}`, sub:`of ${allChs.length}`, icon:'✅', c:'#00e5a0'},
+    {l:'Avg Accuracy', v:`${avgAcc}%`, sub:'all tests', icon:'🎯', c:'#ffb930'},
+    {l:'Speed Index', v:`${avgSpd}%`, sub:'vs expected', icon:'⚡', c:'#38bdf8'},
+    {l:'Pass Rate', v:`${passRate}%`, sub:`${allResults.filter(r=>r.metrics.passed).length}/${n} tests`, icon:'🏆', c:'#a78bfa'}
+  ];
+  document.getElementById('kpi-row').innerHTML = kpis.map((k,i) => `
+    <div class="kpi-card" style="animation-delay:${i*.08}s;animation:fadeUp .5s ease both">
+      <div class="kpi-header">
+        <span class="kpi-icon">${k.icon}</span>
+        <div class="kpi-pulse" style="background:${k.c};box-shadow:0 0 8px ${k.c}"></div>
+      </div>
+      <div class="kpi-value" style="color:${k.c}">${k.v}</div>
+      <div class="kpi-label">${k.l}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  // Subject progress
+  document.getElementById('subj-progress-list').innerHTML = subjects.map(s => {
+    const chs = activeSyllabus[s].chapters;
+    const done = chs.filter(c => chapterStats[c.id]?.completed).length;
+    const pct = chs.length > 0 ? Math.round((done/chs.length)*100) : 0;
+    const color = activeSyllabus[s].color || '#00e5a0';
+    return `<div class="subj-prog-item">
+      <div class="subj-prog-header">
+        <div class="subj-prog-name"><span>${activeSyllabus[s].icon}</span>${s.replace('_',' ')}</div>
+        ${makeTag(`${done}/${chs.length}`, color)}
+      </div>
+      ${makeBar(pct, color, '', '', 7)}
+    </div>`;
+  }).join('');
+
+  // Performance overview
+  if (n === 0) {
+    document.getElementById('perf-overview').innerHTML = `<div class="text-center" style="padding:24px">
+      <div style="font-size:32px;margin-bottom:8px">📊</div>
+      <p style="color:var(--t2);font-size:13px;margin-bottom:12px">Complete a test to see breakdown</p>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('practice', document.querySelectorAll('.nav-item')[2])">Start Practice</button>
+    </div>`;
+  } else {
+    const easyA = avg(allResults, 'easyAcc'), medA = avg(allResults, 'medAcc'), hardA = avg(allResults, 'hardAcc');
+    const perf = Math.round(avgAcc*.6 + avgSpd*.4);
+    document.getElementById('perf-overview').innerHTML = `
+      <div class="radial-row">${makeRadial(avgAcc,78,'#00e5a0','Accuracy')}${makeRadial(avgSpd,78,'#ffb930','Speed')}${makeRadial(perf,78,'#a78bfa','Overall')}</div>
+      ${makeBar(easyA,'#00e5a0','Easy',`${easyA}%`,5)}
+      ${makeBar(medA,'#ffb930','Medium',`${medA}%`,5)}
+      ${makeBar(hardA,'#ff6b6b','Hard',`${hardA}%`,5)}`;
+  }
+
+  // Weak chapters
+  const weak = getAllChapters().filter(c => { const s=chapterStats[c.id]; return s?.attempts>0&&!s.completed; })
+    .map(c=>({...c,score:chapterStats[c.id]?.bestScore||0})).sort((a,b)=>a.score-b.score).slice(0,3);
+  document.getElementById('weak-list').innerHTML = weak.length === 0
+    ? `<p style="color:var(--t2);font-size:13px">${n===0?'Start practicing':'No weak chapters!'}</p>`
+    : weak.map(c => `<div class="activity-item" style="cursor:pointer" onclick="goToPractice('${c.subject}','${c.id}')">
+      <div><div class="act-title">${c.name}</div><div class="act-date">${c.subject?.replace('_',' ')}</div></div>
+      ${makeBadge(c.score+'%', c.score<40?'#ff6b6b':'#ffb930')}
+    </div>`).join('');
+
+  // Strong chapters
+  const strong = getAllChapters().filter(c => chapterStats[c.id]?.completed)
+    .map(c=>({...c,score:chapterStats[c.id]?.bestScore||0})).sort((a,b)=>b.score-a.score).slice(0,3);
+  document.getElementById('strong-list').innerHTML = strong.length === 0
+    ? `<p style="color:var(--t2);font-size:13px">Complete chapters to see strengths</p>`
+    : strong.map(c => `<div class="activity-item">
+      <div><div class="act-title">${c.name}</div><div class="act-date">${c.subject?.replace('_',' ')}</div></div>
+      ${makeBadge(c.score+'%','#00e5a0')}
+    </div>`).join('');
+
+  // Recent tests
+  const recent = [...allResults].sort((a,b) => b.timestamp-a.timestamp).slice(0,4);
+  document.getElementById('recent-list').innerHTML = recent.length === 0
+    ? `<p style="color:var(--t2);font-size:13px">No tests yet</p>`
+    : recent.map(r => `<div class="activity-item">
+      <div><div class="act-title">${r.chapterName}</div><div class="act-date">${new Date(r.timestamp).toLocaleDateString()}</div></div>
+      <div><div class="act-score" style="color:${r.metrics.passed?'#00e5a0':'#ff6b6b'}">${r.metrics.accuracy}%</div>
+      <div class="act-status" style="color:${r.metrics.passed?'#00e5a0':'#ff6b6b'}">${r.metrics.passed?'✓ Pass':'✗ Fail'}</div></div>
+    </div>`).join('');
+}
+
+function goToPractice(subj, chId) {
+  pracSubj = subj;
+  const ch = activeSyllabus[subj]?.chapters.find(c => c.id === chId);
+  if (ch) { pracCh = ch; }
+  showPage('practice', document.querySelectorAll('.nav-item')[2]);
+  renderPracticeSelect();
+  if (ch) setTimeout(() => selectPracCh(chId), 100);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SYLLABUS RENDER
+// ═══════════════════════════════════════════════════════════
+let activeSylSubj = '';
+
+function renderSyllabus() {
+  const subjects = Object.keys(activeSyllabus);
+  activeSylSubj = subjects[0] || '';
+  document.getElementById('syl-subtitle').textContent = `Class ${student.cls} · ${student.board} Board`;
+  renderSylTabs();
+  renderSylChapters();
+}
+
+function renderSylTabs() {
+  const subjects = Object.keys(activeSyllabus);
+  document.getElementById('syl-tabs').innerHTML = subjects.map(s => {
+    const chs = activeSyllabus[s].chapters;
+    const done = chs.filter(c => chapterStats[c.id]?.completed).length;
+    const color = activeSyllabus[s].color || '#00e5a0';
+    return `<button class="subject-tab${s===activeSylSubj?' active':''}" onclick="switchSylSubj('${s}',this)">
+      <span>${activeSyllabus[s].icon}</span>${s.replace('_',' ')}
+      <span class="tab-count">${done}/${chs.length}</span>
+    </button>`;
+  }).join('');
+}
+
+function switchSylSubj(s, btn) {
+  activeSylSubj = s;
+  document.querySelectorAll('.subject-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderSylChapters();
+}
+
+function renderSylChapters() {
+  const chs = activeSyllabus[activeSylSubj]?.chapters || [];
+  const color = activeSyllabus[activeSylSubj]?.color || '#00e5a0';
+  document.getElementById('syl-chapters').innerHTML = chs.map((ch, i) => {
+    const stat = chapterStats[ch.id] || {};
+    const sc = stat.completed ? '#00e5a0' : stat.attempts > 0 ? '#ffb930' : '#4a5068';
+    const si = stat.completed ? '✅' : stat.attempts > 0 ? '🔄' : '⬜';
+    return `<div class="chapter-item" id="chi-${ch.id}">
+      <div class="chapter-header" onclick="toggleChapter('${ch.id}')">
+        <div class="ch-num" style="background:${color}18;color:${color}">${String(i+1).padStart(2,'0')}</div>
+        <div class="ch-info">
+          <div class="ch-name" style="color:var(--t1)">${ch.name}</div>
+          <div class="ch-meta">${ch.topics.length} topics · ${ch.concepts.length} concepts</div>
+        </div>
+        <div class="ch-actions">
+          ${stat.attempts>0 ? makeBadge(`Best: ${stat.bestScore}%`, sc) : ''}
+          <span>${si}</span>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();goToPractice('${activeSylSubj}','${ch.id}')">Practice</button>
+          <span class="ch-arrow">▼</span>
+        </div>
+      </div>
+      <div class="chapter-body">
+        <div class="ch-body-grid">
+          <div>
+            <div class="ch-section-title">TOPICS</div>
+            ${ch.topics.map(t => `<div class="topic-item"><div class="topic-dot" style="background:${color}"></div>${t}</div>`).join('')}
+          </div>
+          <div>
+            <div class="ch-section-title">KEY CONCEPTS</div>
+            <div class="tags-wrap">${ch.concepts.map(c => makeTag(c, color)).join('')}</div>
+            ${stat.attempts>0 ? `<div style="margin-top:12px;padding:11px;background:var(--ink3);border-radius:9px">
+              <div style="font-size:10px;color:var(--t3);margin-bottom:7px">PERFORMANCE</div>
+              ${makeBar(stat.bestScore||0, sc, 'Best Score', `${stat.bestScore||0}%`, 5)}
+              <div style="font-size:11px;color:var(--t2)">Attempts: ${stat.attempts}</div>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleChapter(id) {
+  const el = document.getElementById('chi-' + id);
+  el.classList.toggle('expanded');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PRACTICE RENDER
+// ═══════════════════════════════════════════════════════════
+let activePracSubj = '';
+
+function renderPracticeSelect() {
+  const subjects = Object.keys(activeSyllabus);
+  activePracSubj = pracSubj || subjects[0] || '';
+  document.getElementById('prac-subj-list').innerHTML = subjects.map(s => {
+    const color = activeSyllabus[s].color || '#00e5a0';
+    const active = s === activePracSubj;
+    return `<button onclick="selectPracSubj('${s}',this)"
+      style="display:flex;align-items:center;gap:9px;width:100%;padding:11px 12px;border-radius:10px;margin-bottom:7px;
+        cursor:pointer;text-align:left;background:${active?color+'12':'#1c2030'};
+        border:2px solid ${active?color:'#2c3148'};color:${active?color:'#8890a8'};
+        font-family:var(--fb);font-size:14px;font-weight:${active?700:500};transition:all .2s"
+      class="prac-subj-btn${active?' prac-subj-active':''}">
+      <span style="font-size:16px">${activeSyllabus[s].icon}</span>${s.replace('_',' ')}
+      ${active?'<span style="margin-left:auto">✓</span>':''}
+    </button>`;
+  }).join('');
+  renderPracChList();
+}
+
+function selectPracSubj(subj, btn) {
+  activePracSubj = subj; pracCh = null;
+  document.getElementById('prac-ch-preview').classList.add('hidden');
+  renderPracticeSelect();
+}
+
+function renderPracChList() {
+  const chs = activeSyllabus[activePracSubj]?.chapters || [];
+  document.getElementById('prac-ch-list').innerHTML = chs.map(ch => {
+    const stat = chapterStats[ch.id] || {};
+    const sel = pracCh?.id === ch.id;
+    return `<button class="ch-btn${sel?' selected':''}" id="chbtn-${ch.id}" onclick="selectPracCh('${ch.id}')">
+      <span>${ch.name}</span>
+      <div style="display:flex;gap:5px;align-items:center">
+        ${stat.attempts>0 ? `<span style="font-size:11px;color:${stat.completed?'#00e5a0':'#ffb930'}">${stat.bestScore}%</span>` : ''}
+        <span style="font-size:11px">${stat.completed?'✅':stat.attempts>0?'🔄':'⬜'}</span>
+      </div>
+    </button>`;
+  }).join('');
+}
+
+function selectPracCh(chId) {
+  const ch = activeSyllabus[activePracSubj]?.chapters.find(c => c.id === chId);
+  if (!ch) return;
+  pracCh = ch;
+  renderPracChList();
+  const color = activeSyllabus[activePracSubj]?.color || '#00e5a0';
+  document.getElementById('ch-preview-info').innerHTML = `
+    <div style="font-size:11px;color:var(--t3);margin-bottom:5px">SELECTED</div>
+    <div style="color:var(--t1);font-weight:700;font-size:13px;margin-bottom:5px">${ch.name}</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">${ch.topics.slice(0,3).map(t => makeTag(t, color)).join('')}${ch.topics.length>3?makeTag(`+${ch.topics.length-3} more`,'#4a5068'):''}</div>`;
+  document.getElementById('prac-ch-preview').classList.remove('hidden');
+}
+
+function showPracPhase(phase) {
+  ['select','generating','ready','active','result'].forEach(p => {
+    document.getElementById('prac-' + p).classList.add('hidden');
+  });
+  document.getElementById('prac-' + phase).classList.remove('hidden');
+  document.getElementById('prac-' + phase).style.display = '';
+}
+
+async function startGenerate() {
+  if (!pracCh) return;
+  showPracPhase('generating');
+  document.getElementById('gen-ch-name').textContent = pracCh.name;
+  pracQuestions = buildQuestions(pracCh.name, pracCh.topics);
+  pracQIdx = 0; pracAnswers = {};
+  // Simulate AI generation delay
+  await new Promise(r => setTimeout(r, 1800));
+  renderReadyScreen();
+  showPracPhase('ready');
+}
+
+function renderReadyScreen() {
+  document.getElementById('ready-title').textContent = pracCh.name;
+  document.getElementById('ready-meta').textContent = `${activePracSubj.replace('_',' ')} · Class ${student.cls} · ${student.board}`;
+  const easy = pracQuestions.filter(q => q.difficulty === 'Easy').length;
+  const med = pracQuestions.filter(q => q.difficulty === 'Medium').length;
+  const hard = pracQuestions.filter(q => q.difficulty === 'Hard').length;
+  const totSec = pracQuestions.reduce((s, q) => s + q.expectedTime, 0);
+  const totMarks = pracQuestions.reduce((s, q) => s + q.marks, 0);
+  document.getElementById('ready-stats').innerHTML = [
+    {l:'Questions',v:pracQuestions.length,c:'var(--t1)'},{l:'Easy',v:easy,c:'#00e5a0'},
+    {l:'Medium',v:med,c:'#ffb930'},{l:'Hard',v:hard,c:'#ff6b6b'}
+  ].map(it => `<div class="ready-cell"><div class="ready-val" style="color:${it.c}">${it.v}</div><div class="ready-lab">${it.l}</div></div>`).join('');
+  document.getElementById('ready-time').textContent = `${Math.ceil(totSec/60)} min`;
+  document.getElementById('ready-marks').textContent = totMarks;
+}
+
+function beginTest() {
+  pracQIdx = 0; pracAnswers = {}; totalElapsed = 0;
+  showPracPhase('active');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = pracQuestions[pracQIdx];
+  if (!q) return;
+  const dc = {Easy:'#00e5a0', Medium:'#ffb930', Hard:'#ff6b6b'}[q.difficulty];
+  const prog = ((pracQIdx+1)/pracQuestions.length)*100;
+
+  document.getElementById('q-counter').textContent = `Q${pracQIdx+1}/${pracQuestions.length}`;
+  document.getElementById('q-diff-badge').textContent = q.difficulty;
+  document.getElementById('q-diff-badge').style.cssText = `background:${dc}18;color:${dc};border:1px solid ${dc}30`;
+  document.getElementById('q-marks-badge').textContent = `${q.marks} mark${q.marks>1?'s':''}`;
+  document.getElementById('q-prog').style.width = prog + '%';
+  document.getElementById('q-topic-label').textContent = 'TOPIC: ' + q.topic;
+  document.getElementById('q-text').textContent = `${pracQIdx+1}. ${q.text}`;
+  document.getElementById('q-next-btn').style.display = 'none';
+
+  document.getElementById('q-options').innerHTML = q.options.map((opt, i) => `
+    <div class="option" id="opt-${i}" onclick="handleAnswer(${i})">
+      <span class="opt-label" style="background:${dc}20;color:${dc}">${opt.label}</span>
+      <span class="opt-text">${opt.text}</span>
+    </div>`).join('');
+
+  // Update question map
+  document.getElementById('q-map').innerHTML = pracQuestions.map((q2, i) => {
+    const a = pracAnswers[i];
+    const dc2 = {Easy:'#00e5a0',Medium:'#ffb930',Hard:'#ff6b6b'}[q2.difficulty];
+    let bg = i === pracQIdx ? '#a78bfa' : a !== undefined ? (a.selectedIndex===q2.correctIndex?'#00e5a0':'#ff6b6b') : dc2+'45';
+    return `<div class="q-dot" style="background:${bg};border:1px solid ${i===pracQIdx?'#a78bfa':'transparent'}">${i+1}</div>`;
+  }).join('');
+
+  // Timer
+  clearInterval(qTimerInterval); qElapsed = 0;
+  document.getElementById('q-exp-time').textContent = `/${q.expectedTime}s`;
+  document.getElementById('q-timer').textContent = `⏱ 0s`;
+  document.getElementById('q-timer').style.color = 'var(--t2)';
+  qTimerInterval = setInterval(() => {
+    qElapsed++; totalElapsed++;
+    document.getElementById('q-timer').textContent = `⏱ ${qElapsed}s`;
+    const tc = qElapsed > q.expectedTime * 1.5 ? '#ff6b6b' : qElapsed > q.expectedTime ? '#ffb930' : 'var(--t2)';
+    document.getElementById('q-timer').style.color = tc;
+  }, 1000);
+}
+
+function handleAnswer(optIdx) {
+  const q = pracQuestions[pracQIdx];
+  if (pracAnswers[pracQIdx] !== undefined) return;
+  clearInterval(qTimerInterval);
+  pracAnswers[pracQIdx] = {selectedIndex: optIdx, timeTaken: qElapsed};
+
+  // Show feedback
+  q.options.forEach((opt, i) => {
+    const el = document.getElementById('opt-' + i);
+    el.classList.add('answered');
+    if (opt.isCorrect) el.classList.add('correct');
+    else if (i === optIdx) el.classList.add('wrong');
+    const label = el.querySelector('.opt-label');
+    if (opt.isCorrect) { label.textContent = '✓'; label.style.background='rgba(0,229,160,.2)'; label.style.color='#00e5a0'; }
+    else if (i === optIdx) { label.textContent = '✗'; label.style.background='rgba(255,107,107,.15)'; label.style.color='#ff6b6b'; }
+  });
+
+  // Update map
+  const dc = {Easy:'#00e5a0',Medium:'#ffb930',Hard:'#ff6b6b'}[q.difficulty];
+  pracQuestions.forEach((q2, i) => {
+    const a = pracAnswers[i];
+    const dc2 = {Easy:'#00e5a0',Medium:'#ffb930',Hard:'#ff6b6b'}[q2.difficulty];
+    let bg = i === pracQIdx ? '#a78bfa' : a !== undefined ? (a.selectedIndex===q2.correctIndex?'#00e5a0':'#ff6b6b') : dc2+'45';
+    const dot = document.querySelectorAll('.q-dot')[i];
+    if (dot) dot.style.background = bg;
+  });
+
+  const nextBtn = document.getElementById('q-next-btn');
+  nextBtn.style.display = 'flex';
+  nextBtn.classList.remove('hidden');
+}
+
+function nextQuestion() {
+  if (pracQIdx < pracQuestions.length - 1) {
+    pracQIdx++;
+    renderQuestion();
+  } else {
+    finishTest();
+  }
+}
+
+function computeTestMetrics() {
+  let correct=0,tt=0,ea=0,et=0,ma=0,mt=0,ha=0,ht=0,earned=0,totalMarks=0;
+  pracQuestions.forEach((q,i) => {
+    const a = pracAnswers[i]; if(!a) return;
+    const ok = a.selectedIndex === q.correctIndex;
+    tt += a.timeTaken || q.expectedTime; totalMarks += q.marks;
+    if(ok){correct++; earned+=q.marks;}
+    if(q.difficulty==='Easy'){et++; if(ok)ea++;}
+    else if(q.difficulty==='Medium'){mt++; if(ok)ma++;}
+    else{ht++; if(ok)ha++;}
+  });
+  const n=pracQuestions.length;
+  const acc=n>0?(correct/n)*100:0;
+  const avgT=n>0?tt/n:60;
+  const expAvg=n>0?pracQuestions.reduce((s,q)=>s+q.expectedTime,0)/n:60;
+  const spd=Math.max(0,Math.min(100,(expAvg/Math.max(avgT,1))*100));
+  const perf=acc*.6+spd*.4;
+  const mp=totalMarks>0?(earned/totalMarks)*100:0;
+  return {accuracy:Math.round(acc),speedScore:Math.round(spd),performanceScore:Math.round(perf),
+    correct,total:n,avgTime:Math.round(avgT),markPct:Math.round(mp),
+    earned,totalMarks,passed:mp>=60,
+    easyAcc:et>0?Math.round((ea/et)*100):0, medAcc:mt>0?Math.round((ma/mt)*100):0, hardAcc:ht>0?Math.round((ha/ht)*100):0};
+}
+
+const AI_INSIGHTS = [
+  "Excellent work! Your accuracy on easy and medium questions is strong. Focus on time management for hard questions — try to stay within the expected time to boost your speed score further. Review the advanced applications of key concepts.",
+  "Good effort! You're showing solid understanding of fundamentals. To improve, spend extra time on medium difficulty questions — they show the most room for growth. Practice applying concepts step-by-step before attempting complex problems.",
+  "Keep pushing! Your foundational knowledge is building. Start with reviewing core definitions daily for 10 minutes, then work through medium-difficulty practice problems. Your speed will improve naturally as concepts become more familiar.",
+  "Strong start! Your easy question accuracy shows you understand basics well. The key to advancing is connecting concepts across topics — try to see how each concept in this chapter links to others. That will unlock better performance on hard questions.",
+];
+
+function finishTest() {
+  clearInterval(qTimerInterval);
+  showPracPhase('result');
+  const m = computeTestMetrics();
+  const sc = m.markPct >= 70 ? '#00e5a0' : m.markPct >= 50 ? '#ffb930' : '#ff6b6b';
+
+  // Update stats
+  const ex = chapterStats[pracCh.id] || {attempts:0, bestScore:0, completed:false};
+  const newBest = Math.max(ex.bestScore||0, m.markPct);
+  chapterStats[pracCh.id] = {attempts:ex.attempts+1, bestScore:newBest, completed:ex.completed||m.passed, lastScore:m.markPct};
+  allResults.push({
+    subject:activePracSubj, chapterName:pracCh.name, chapterId:pracCh.id,
+    timestamp:Date.now(), metrics:m, answers:pracAnswers,
+    questions:pracQuestions.map(q=>({id:q.id,text:q.text,difficulty:q.difficulty,topic:q.topic}))
+  });
+
+  updateProgress();
+  renderDashboard();
+
+  // Score card
+  document.getElementById('result-pct').textContent = m.markPct + '%';
+  document.getElementById('result-pct').style.color = sc;
+  document.getElementById('result-detail').textContent = `${m.earned}/${m.totalMarks} marks · ${m.correct}/${m.total} correct`;
+  document.getElementById('result-emoji').textContent = m.passed ? '🏆' : '📖';
+  const scoreCard = document.getElementById('result-score-card');
+  scoreCard.style.boxShadow = `0 0 40px ${sc}25`;
+  document.getElementById('result-status-box').textContent = m.passed ? '✅ CHAPTER PASSED' : '❌ NOT PASSED — need 60%';
+  document.getElementById('result-status-box').style.cssText = `padding:10px 20px;border-radius:10px;text-align:center;font-weight:700;font-size:14px;background:${sc}15;border:1px solid ${sc}35;color:${sc}`;
+
+  // Radials
+  document.getElementById('result-radials').innerHTML = makeRadial(m.accuracy,76,'#00e5a0','Accuracy') + makeRadial(m.speedScore,76,'#ffb930','Speed') + makeRadial(m.performanceScore,76,'#a78bfa','Overall');
+  document.getElementById('result-bars').innerHTML = makeBar(m.easyAcc,'#00e5a0','Easy',`${m.easyAcc}%`,5)+makeBar(m.medAcc,'#ffb930','Medium',`${m.medAcc}%`,5)+makeBar(m.hardAcc,'#ff6b6b','Hard',`${m.hardAcc}%`,5);
+  document.getElementById('result-time-info').textContent = `⏱ Avg response: ${m.avgTime}s`;
+
+  // AI insight (simulated typing)
+  const insight = AI_INSIGHTS[Math.floor(Math.random() * AI_INSIGHTS.length)];
+  const insightEl = document.getElementById('ai-insight-text');
+  insightEl.textContent = '';
+  insightEl.classList.add('typing-cursor');
+  let ci = 0;
+  const typeInterval = setInterval(() => {
+    if (ci < insight.length) {
+      insightEl.textContent += insight[ci++];
+    } else {
+      clearInterval(typeInterval);
+      insightEl.classList.remove('typing-cursor');
+    }
+  }, 22);
+
+  // Question review
+  document.getElementById('result-q-review').innerHTML = pracQuestions.map((q2, i) => {
+    const a = pracAnswers[i];
+    const ok = a?.selectedIndex === q2.correctIndex;
+    const dc2 = {Easy:'#00e5a0',Medium:'#ffb930',Hard:'#ff6b6b'}[q2.difficulty];
+    return `<div style="display:flex;align-items:center;gap:9px;padding:9px 11px;background:${ok?'rgba(0,229,160,.06)':'rgba(255,107,107,.06)'};border:1px solid ${ok?'rgba(0,229,160,.25)':'rgba(255,107,107,.2)'};border-radius:9px">
+      <span style="font-size:14px">${ok?'✅':'❌'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Q${i+1}: ${q2.topic}</div>
+        <div style="display:flex;gap:4px;margin-top:2px">${makeTag(q2.difficulty, dc2)}<span style="font-size:10px;color:var(--t3)">${a?.timeTaken||0}s</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function retryTest() {
+  pracAnswers = {}; pracQIdx = 0;
+  showPracPhase('ready');
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANALYTICS RENDER
+// ═══════════════════════════════════════════════════════════
+function renderAnalytics() { refreshAnalytics(); }
+
+function refreshAnalytics() {
+  const n = allResults.length;
+  document.getElementById('ana-subtitle').textContent = `Based on ${n} test${n!==1?'s':''}`;
+
+  if (n === 0) {
+    document.getElementById('ana-kpis').innerHTML = `<div class="card" style="grid-column:span 4;text-align:center;padding:40px">
+      <div style="font-size:48px;margin-bottom:12px;animation:float 3s ease-in-out infinite">📊</div>
+      <h3 style="color:var(--t1);font-family:var(--fd);margin-bottom:8px">No data yet</h3>
+      <p style="color:var(--t2)">Complete at least one test to see analytics</p>
+    </div>`;
+    ['ana-timeline','ana-subject','ana-heatmap','ana-patterns'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=''; });
+    return;
+  }
+
+  const avgAcc = avg(allResults,'accuracy'), avgSpd = avg(allResults,'speedScore');
+  const avgPerf = avg(allResults,'performanceScore');
+  const passRate = Math.round((allResults.filter(r=>r.metrics.passed).length/n)*100);
+
+  document.getElementById('ana-kpis').innerHTML = [
+    {l:'Accuracy',v:avgAcc,c:'#00e5a0'},{l:'Speed Index',v:avgSpd,c:'#ffb930'},
+    {l:'Performance',v:avgPerf,c:'#a78bfa'},{l:'Pass Rate',v:passRate,c:'#38bdf8'}
+  ].map(m => `<div class="card" style="text-align:center;padding:18px">
+    ${makeRadial(m.v, 82, m.c, '')}
+    <div style="font-size:12px;color:var(--t2);margin-top:7px;font-weight:500">${m.l}</div>
+  </div>`).join('');
+
+  // Timeline
+  const tl = [...allResults].sort((a,b) => a.timestamp-b.timestamp).slice(-10);
+  document.getElementById('ana-timeline').innerHTML = tl.map((r,i) => `
+    <div class="timeline-row">
+      <span class="tl-num">${i+1}</span>
+      <div class="tl-info">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-size:11px;color:var(--t1);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:145px">${r.chapterName}</span>
+          <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+            <span style="font-size:11px;color:var(--t2)">${r.metrics.accuracy}%</span>
+            <span style="font-size:11px;color:${r.metrics.passed?'#00e5a0':'#ff6b6b'}">${r.metrics.passed?'✓':'✗'}</span>
+          </div>
+        </div>
+        <div class="tl-bars">
+          <div class="tl-acc" style="width:${r.metrics.accuracy}%;background:rgba(0,229,160,.55)"></div>
+          <div class="tl-spd" style="width:${r.metrics.speedScore}%;background:rgba(255,185,48,.38)"></div>
+        </div>
+      </div>
+    </div>`).join('') + `<div style="display:flex;gap:10px;margin-top:10px">
+      <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(0,229,160,.55)"></div>Accuracy</div>
+      <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(255,185,48,.38)"></div>Speed</div>
+    </div>`;
+
+  // Subject breakdown
+  const bySubj = {};
+  allResults.forEach(r => { if(!bySubj[r.subject]) bySubj[r.subject]=[]; bySubj[r.subject].push(r); });
+  document.getElementById('ana-subject').innerHTML = Object.entries(bySubj).map(([s, res]) => {
+    const avgA = avg(res,'accuracy'), avgS = avg(res,'speedScore');
+    const color = getSubjColor(s);
+    const chs = activeSyllabus[s]?.chapters||[];
+    const done = chs.filter(c => chapterStats[c.id]?.completed).length;
+    return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bd2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--t1)"><span>${activeSyllabus[s]?.icon||'📚'}</span>${s.replace('_',' ')}</div>
+        <span style="font-size:10px;color:var(--t3)">${res.length} test${res.length>1?'s':''}</span>
+      </div>
+      ${makeBar(avgA, color, 'Accuracy', `${avgA}%`, 5)}
+      ${makeBar(avgS, color+'90', 'Speed', `${avgS}%`, 5)}
+      <div style="font-size:10px;color:var(--t3)">${done}/${chs.length} chapters done</div>
+    </div>`;
+  }).join('');
+
+  // Heatmap
+  const allChs = getAllChapters();
+  document.getElementById('ana-heatmap').innerHTML = allChs.map(ch => {
+    const st = chapterStats[ch.id]||{};
+    const score = st.bestScore||0; const att = st.attempts||0;
+    const bg = att===0 ? 'rgba(44,49,72,.6)' : score>=70 ? 'rgba(0,229,160,.32)' : score>=50 ? 'rgba(255,185,48,.32)' : 'rgba(255,107,107,.32)';
+    const border = att===0 ? '#2c3148' : score>=70 ? '#00e5a0' : score>=50 ? '#ffb930' : '#ff6b6b';
+    const textColor = att===0 ? '#4a5068' : score>=70 ? '#00e5a0' : score>=50 ? '#ffb930' : '#ff6b6b';
+    return `<div class="heat-cell" style="background:${bg};border-color:${border};color:${textColor}" title="${ch.name} | ${ch.subject} | Best: ${score}% | ${att} attempts">${att>0?score:'—'}</div>`;
+  }).join('');
+
+  // Patterns
+  const allChs2 = getAllChapters();
+  const strong = allChs2.filter(c=>chapterStats[c.id]?.completed).map(c=>c.name).slice(0,3);
+  const weak = allChs2.filter(c=>{const s=chapterStats[c.id];return s?.attempts>0&&!s.completed;}).map(c=>c.name).slice(0,3);
+  const slowChs = allResults.filter(r=>r.metrics.speedScore<50).map(r=>r.chapterName).filter((v,i,a)=>a.indexOf(v)===i).slice(0,3);
+  document.getElementById('ana-patterns').innerHTML = [
+    {l:'💪 Strong',c:'#00e5a0',items:strong},
+    {l:'📖 Needs Revision',c:'#ffb930',items:weak},
+    {l:'⚡ Speed Issue',c:'#ff6b6b',items:slowChs},
+  ].map(s => `<div style="padding:13px;background:var(--ink3);border-radius:11px;border:1px solid ${s.c}20">
+    <div style="color:${s.c};font-weight:700;font-size:13px;margin-bottom:9px">${s.l}</div>
+    ${s.items.length===0 ? `<span style="color:var(--t3);font-size:12px">None identified</span>` :
+      s.items.map(name => `<div style="font-size:12px;color:var(--t1);padding:3px 0;border-bottom:1px solid var(--bd2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</div>`).join('')}
+  </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// REPORTS RENDER
+// ═══════════════════════════════════════════════════════════
+function renderReports() { refreshReports(); }
+
+const MOCK_REPORTS = {
+  progress:`📈 PROGRESS REPORT — ${new Date().toLocaleDateString()}
+
+Overview: Your learning journey is progressing steadily. You have demonstrated consistent effort across multiple subjects with a growing mastery of core concepts.
+
+Achievements: Successfully completed chapters with scores above 65%, showing strong understanding of fundamental topics. Your accuracy rate demonstrates solid conceptual grasp.
+
+Areas of Growth: Medium and hard-difficulty questions present opportunities for deeper learning. Speed optimization will further boost your performance score.
+
+Next Steps: Focus revision on chapters with attempts but no completion. Dedicate 20 minutes daily to practicing medium-level questions. Set a goal of completing 2 more chapters this week.`,
+
+  subject:`📚 SUBJECT-WISE ANALYSIS
+
+Mathematics shows your strongest performance — consistent high accuracy reflects solid procedural knowledge. Keep challenging yourself with application-based problems.
+
+Science demonstrates good factual recall with room to improve analytical thinking. Experiment with diagram-based revision for better retention.
+
+Cross-subject Pattern: You perform best on recall-type questions (Easy) across all subjects. The gap between Easy and Hard question performance suggests focusing on building conceptual depth rather than just memorization.
+
+Recommendation: Allocate 40% study time to your weakest subject, 35% to strengthen moderate areas, and 25% to maintaining strengths.`,
+
+  improvement:`🎯 IMPROVEMENT PLAN — 30 Day Goal
+
+Priority Focus Areas:
+→ Hard-difficulty questions (currently weakest area)
+→ Speed improvement on Medium questions
+→ Incomplete chapter completion
+
+Daily 30-Min Schedule:
+• 0–10 min: Quick concept review of target chapter
+• 10–20 min: Solve 5 medium-difficulty questions
+• 20–30 min: Review mistakes and note patterns
+
+Practice Strategy: Attempt each incomplete chapter twice per week. Don't skip review — understanding why an answer is wrong is more valuable than getting it right.
+
+30-Day Goal: Complete 4 more chapters, raise average accuracy to 75%, reduce average response time by 15 seconds.`,
+
+  parent:`👨‍👩‍👧 PARENT SUMMARY
+
+Dear Parent,
+
+Your child is actively using the EduAI learning platform and making measurable progress.
+
+Current Level: Developing — showing solid foundational knowledge with opportunities to deepen understanding.
+
+What's Going Well: Regular practice habits, strong performance on fundamental questions, and good subject coverage across the curriculum.
+
+What Needs Attention: Advanced problem-solving skills need more practice time. Encouraging 30 minutes of daily focused study (without distractions) will make a significant difference.
+
+How You Can Help: Ask about what was learned each day — this simple habit reinforces memory. Celebrate effort, not just scores. The AI system is tracking progress and providing personalized guidance.`,
+
+  exam:`🏆 EXAM PREPARATION STRATEGY
+
+Time Allocation by Subject:
+• Mathematics: 35% (highest weightage, needs most practice)
+• Science: 30% (conceptual + numerical balance)  
+• Social Science: 20% (reading + recall heavy)
+• English: 15% (language skills + literature)
+
+Revision Priorities:
+1. Chapters with 50–65% scores — closest to mastery
+2. High-weightage topics identified in the syllabus
+3. Previous year pattern analysis for question types
+
+Practice Approach:
+• Week 1–2: Chapter-wise revision with timed tests
+• Week 3: Full-length mixed practice papers
+• Week 4: Weak area focus + speed drills
+
+Exam Day Tips: Sleep 8 hours before exam. Attempt easiest questions first to build confidence. Allocate time per section strictly.
+
+2-Week Plan: Complete all pending chapters → Mock tests → Review → Final revision.`
+};
+
+function refreshReports() {
+  const subjects = Object.keys(activeSyllabus);
+  const totalCh = subjects.reduce((s,subj) => s+(activeSyllabus[subj].chapters?.length||0), 0);
+  const doneCh = Object.values(chapterStats).filter(s => s.completed).length;
+  const avgAcc = avg(allResults,'accuracy');
+  const avgPerf = avg(allResults,'performanceScore');
+  const n = allResults.length;
+
+  document.getElementById('rep-kpis').innerHTML = [
+    {l:'Completion',v:`${totalCh>0?Math.round((doneCh/totalCh)*100):0}%`,sub:`${doneCh}/${totalCh} chapters`,c:'#00e5a0'},
+    {l:'Tests Done',v:n,sub:`${allResults.filter(r=>r.metrics.passed).length} passed`,c:'#ffb930'},
+    {l:'Avg Accuracy',v:`${avgAcc}%`,sub:'all tests',c:'#a78bfa'},
+    {l:'Mastery',v:avgPerf>=75?'Advanced':avgPerf>=50?'Growing':n>0?'Beginner':'—',sub:`${avgPerf}% score`,c:'#38bdf8'}
+  ].map(s => `<div class="card" style="padding:16px">
+    <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:${s.c};line-height:1">${s.v}</div>
+    <div style="font-size:12px;font-weight:600;color:var(--t1);margin-top:5px">${s.l}</div>
+    <div style="font-size:11px;color:var(--t3);margin-top:2px">${s.sub}</div>
+  </div>`).join('');
+
+  // Chapter table
+  const attempted = getAllChapters().filter(ch => chapterStats[ch.id]?.attempts > 0);
+  if (attempted.length === 0) {
+    document.getElementById('rep-ch-grid').innerHTML = `<p style="color:var(--t2);font-size:13px;grid-column:span 3">Complete tests to see chapter performance</p>`;
+  } else {
+    document.getElementById('rep-ch-grid').innerHTML = attempted.map(ch => {
+      const st = chapterStats[ch.id];
+      const color = getSubjColor(ch.subject);
+      const sc = st.completed ? '#00e5a0' : st.bestScore>=50 ? '#ffb930' : '#ff6b6b';
+      return `<div style="padding:12px 14px;background:var(--ink3);border-radius:11px;border:1px solid ${st.completed?color+'35':'var(--bd)'}">
+        <div style="font-size:12px;font-weight:700;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px">${ch.name}</div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:7px">${ch.subject.replace('_',' ')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          ${makeBadge(`${st.bestScore||0}%`, sc)}
+          <span style="font-size:11px;color:var(--t3)">${st.attempts} att.</span>
+        </div>
+        ${makeBar(st.bestScore||0, sc, '', '', 4)}
+        <span style="font-size:10px;color:${st.completed?'#00e5a0':'#ff6b6b'}">${st.completed?'✅ Completed':'⏳ In Progress'}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+let activeReportBtn = null;
+function generateReport(type, btn) {
+  if (activeReportBtn) activeReportBtn.classList.remove('active');
+  btn.classList.add('active');
+  activeReportBtn = btn;
+
+  const titles = {progress:'📈 Progress Report',subject:'📚 Subject Analysis',improvement:'🎯 Improvement Plan',parent:'👨‍👩‍👧 Parent Summary',exam:'🏆 Exam Strategy'};
+  document.getElementById('rep-output-title').textContent = titles[type] || 'Report';
+
+  // Simulate loading
+  document.getElementById('rep-output').innerHTML = `<div class="loading-screen">
+    <div class="spinner" style="width:32px;height:32px"></div>
+    <p style="color:var(--t2);font-size:13px;margin-top:14px">Generating your AI report...</p>
+  </div>`;
+
+  setTimeout(() => {
+    const content = MOCK_REPORTS[type] || 'Report content unavailable.';
+    const studentName = student.name;
+    const personalised = content.replace('Your child', `${studentName}`);
+    document.getElementById('rep-output').innerHTML = `
+      <div class="report-ai-badge"><span>🤖</span><span>AI-Generated · ${new Date().toLocaleDateString()}</span></div>
+      <div class="report-text" id="report-text-content"></div>`;
+    // Typing effect
+    const el = document.getElementById('report-text-content');
+    el.classList.add('typing-cursor');
+    let ci = 0;
+    const iv = setInterval(() => {
+      if (ci < personalised.length) {
+        el.textContent += personalised[ci++];
+      } else {
+        clearInterval(iv);
+        el.classList.remove('typing-cursor');
+      }
+    }, 8);
+  }, 1200);
+}
+
+// ═══════════════════════════════════════════════════════════
+// USER MENU
+// ═══════════════════════════════════════════════════════════
+let menuOpen = false;
+
+function toggleUserMenu() {
+  menuOpen = !menuOpen;
+  const dd = document.getElementById('user-dropdown');
+  const chevron = document.getElementById('umenu-chevron');
+  dd.style.display = menuOpen ? 'block' : 'none';
+  chevron.style.transform = menuOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  if (menuOpen) {
+    dd.style.animation = 'fadeUp .25s ease';
+  }
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  const btn = document.getElementById('user-menu-btn');
+  const dd = document.getElementById('user-dropdown');
+  if (btn && dd && !btn.contains(e.target) && !dd.contains(e.target)) {
+    menuOpen = false;
+    dd.style.display = 'none';
+    const chevron = document.getElementById('umenu-chevron');
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+  }
+});
+
+function updateUserMenuDisplay() {
+  if (!student) return;
+  document.getElementById('umenu-avatar').textContent = student.avatar;
+  document.getElementById('umenu-name').textContent = student.name;
+}
+
+// ═══════════════════════════════════════════════════════════
+// UPDATE PROFILE MODAL
+// ═══════════════════════════════════════════════════════════
+const AVATARS_LIST = ["🦁","🐯","🦊","🐺","🦅","🐬","🌟","🚀","⚡","🔥","💎","🦋"];
+let upSelectedAvatar = '';
+
+function openUpdateProfile() {
+  // Close dropdown
+  menuOpen = false;
+  document.getElementById('user-dropdown').style.display = 'none';
+
+  // Pre-fill fields
+  upSelectedAvatar = student.avatar;
+  document.getElementById('up-name').value = student.name;
+  document.getElementById('up-email').value = student.email || '';
+  document.getElementById('up-board-display').textContent = student.board;
+  document.getElementById('up-class-display').textContent = 'Class ' + student.cls;
+  document.getElementById('up-success').style.display = 'none';
+  document.getElementById('up-err-name').style.display = 'none';
+  document.getElementById('up-err-email').style.display = 'none';
+
+  // Build avatar grid
+  document.getElementById('up-avatar-grid').innerHTML = AVATARS_LIST.map(a =>
+    `<button onclick="upSelectAvatar(this,'${a}')"
+      style="font-size:20px;padding:7px 9px;border-radius:9px;cursor:pointer;
+        background:${a===upSelectedAvatar?'rgba(0,229,160,.1)':'#1c2030'};
+        border:2px solid ${a===upSelectedAvatar?'var(--jade)':'#2c3148'};
+        transition:all .2s">${a}</button>`
+  ).join('');
+
+  document.getElementById('modal-profile').classList.add('open');
+}
+
+function upSelectAvatar(btn, av) {
+  upSelectedAvatar = av;
+  document.querySelectorAll('#up-avatar-grid button').forEach(b => {
+    b.style.background = '#1c2030';
+    b.style.borderColor = '#2c3148';
+  });
+  btn.style.background = 'rgba(0,229,160,.1)';
+  btn.style.borderColor = 'var(--jade)';
+}
+
+function saveProfile() {
+  const name = document.getElementById('up-name').value.trim();
+  const email = document.getElementById('up-email').value.trim();
+  let ok = true;
+  if (!name) { document.getElementById('up-err-name').style.display = 'block'; ok = false; }
+  else document.getElementById('up-err-name').style.display = 'none';
+  if (!email.includes('@')) { document.getElementById('up-err-email').style.display = 'block'; ok = false; }
+  else document.getElementById('up-err-email').style.display = 'none';
+  if (!ok) return;
+
+  // Apply changes
+  student.name = name;
+  student.email = email;
+  student.avatar = upSelectedAvatar;
+
+  // Update all UI
+  updateSidebar();
+  updateUserMenuDisplay();
+  renderDashboard();
+  if (activePage === 'dashboard') renderDashboard();
+
+  // Show success
+  const succ = document.getElementById('up-success');
+  succ.style.display = 'block';
+  setTimeout(() => {
+    succ.style.display = 'none';
+    closeModal('modal-profile');
+  }, 1800);
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOGOUT MODAL
+// ═══════════════════════════════════════════════════════════
+function openLogout() {
+  menuOpen = false;
+  document.getElementById('user-dropdown').style.display = 'none';
+
+  // Fill logout modal with current student info
+  document.getElementById('lo-avatar').textContent = student.avatar;
+  document.getElementById('lo-name').textContent = student.name;
+  document.getElementById('lo-meta').textContent = `Class ${student.cls} · ${student.board}`;
+  const all = Object.values(chapterStats).length;
+  const done = Object.values(chapterStats).filter(s => s.completed).length;
+  const pct = all > 0 ? Math.round((done/all)*100) : 0;
+  document.getElementById('lo-progress').textContent = pct + '%';
+
+  document.getElementById('modal-logout').classList.add('open');
+}
+
+function confirmLogout() {
+  closeModal('modal-logout');
+  setTimeout(() => {
+    document.getElementById('app').style.opacity = '0';
+    document.getElementById('app').style.transition = 'opacity .4s ease';
+    setTimeout(() => {
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('app').style.opacity = '1';
+      document.getElementById('app').style.transition = '';
+      showLoginScreen();
+    }, 420);
+  }, 150);
+}
+
+// ═══════════════════════════════════════════════════════════
+// GENERIC MODAL CLOSE
+// ═══════════════════════════════════════════════════════════
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modals on backdrop click
+['modal-profile','modal-logout'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', function(e) {
+    if (e.target === this) closeModal(id);
+  });
+});
+</script>
+</body>
+</html>
